@@ -94,3 +94,45 @@ export const fonts: Font[] = [
 ];
 
 export const fontById = (id: string) => fonts.find((f) => f.id === id) ?? fonts[0];
+
+export const bodyFonts: Font[] = [
+	{ id: 'archivo', name: 'Archivo', family: "'Archivo Variable'", weight: 400, stretch: '100%', spacing: '0' },
+	{
+		id: 'cormorant',
+		name: 'Cormorant',
+		family: "'Cormorant Garamond'",
+		weight: 400,
+		stretch: 'normal',
+		spacing: '0',
+		load: () => import('@fontsource/cormorant-garamond/400.css')
+	},
+	{
+		id: 'playfair',
+		name: 'Playfair',
+		family: "'Playfair Display Variable'",
+		weight: 400,
+		stretch: 'normal',
+		spacing: '0',
+		load: () => import('@fontsource-variable/playfair-display')
+	},
+	{
+		id: 'syne',
+		name: 'Syne',
+		family: "'Syne Variable'",
+		weight: 400,
+		stretch: 'normal',
+		spacing: '0',
+		load: () => import('@fontsource-variable/syne')
+	},
+	{
+		id: 'mono',
+		name: 'Space Mono',
+		family: "'Space Mono'",
+		weight: 400,
+		stretch: 'normal',
+		spacing: '0',
+		load: () => import('@fontsource/space-mono/400.css')
+	}
+];
+
+export const bodyFontById = (id: string) => bodyFonts.find((f) => f.id === id) ?? bodyFonts[0];

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { site, art, commissions as c } from '#lib/data.ts';
-	import { custom, defaults } from '#lib/custom.svelte.ts';
+	import { custom, defaults, view } from '#lib/custom.svelte.ts';
 	import Pic from '#lib/Pic.svelte';
 
 	let layout = $derived(custom.on ? custom.commLayout : defaults.commLayout);
@@ -9,7 +9,7 @@
 </script>
 
 <svelte:head>
-	<title>commissions · {site.name}</title>
+	<title>commissions · {view.name}</title>
 </svelte:head>
 
 <main>
@@ -20,7 +20,7 @@
 
 	{#if layout === 'pictures'}
 		<div class="tiers">
-			{#each c.tiers as t, i}
+			{#each view.tiers as t, i}
 				<div class="tier {shape}">
 					<Pic
 						pic={art[t.img]}
@@ -37,7 +37,7 @@
 		</div>
 	{:else}
 		<ul class="list">
-			{#each c.tiers as t}
+			{#each view.tiers as t}
 				<li>
 					<span>{t.name}</span>
 					<i></i>
@@ -48,7 +48,7 @@
 	{/if}
 
 	<p class="order">
-		{c.note}:
+		{view.note}:
 		{#if telegram}<a href={telegram.url} target="_blank" rel="noreferrer">telegram</a> or{/if}
 		<a href="mailto:{site.email}">{site.email}</a>
 	</p>
@@ -68,7 +68,7 @@
 	}
 
 	h1 {
-		font-size: clamp(40px, 9vw, 120px);
+		font-size: calc(clamp(40px, 9vw, 120px) * var(--title-scale, 1));
 		line-height: 0.9;
 	}
 

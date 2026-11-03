@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { site, gallery } from '#lib/data.ts';
 	import Lightbox from '#lib/Lightbox.svelte';
-	import { custom, defaults } from '#lib/custom.svelte.ts';
+	import { custom, defaults, view } from '#lib/custom.svelte.ts';
 	import Pic from '#lib/Pic.svelte';
 
 	let o = $derived(custom.on ? custom : defaults);
@@ -12,7 +12,7 @@
 </script>
 
 <svelte:head>
-	<title>work · {site.name}</title>
+	<title>work · {view.name}</title>
 </svelte:head>
 
 <main>
@@ -57,7 +57,7 @@
 	}
 
 	h1 {
-		font-size: clamp(48px, 9vw, 120px);
+		font-size: calc(clamp(48px, 9vw, 120px) * var(--title-scale, 1));
 		line-height: 0.9;
 	}
 

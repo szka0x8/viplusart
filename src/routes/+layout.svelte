@@ -4,9 +4,9 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/state';
 	import { site } from '#lib/data.ts';
-	import { custom, load } from '#lib/custom.svelte.ts';
+	import { custom, load, view } from '#lib/custom.svelte.ts';
 	import TryPanel from '#lib/TryPanel.svelte';
-	import { fontById } from '#lib/fonts.ts';
+	import { fontById, bodyFontById } from '#lib/fonts.ts';
 	import type { LayoutProps } from './$types';
 
 	let { children }: LayoutProps = $props();
@@ -36,6 +36,18 @@
 		}
 	});
 
+	$effect(() => {
+		const html = document.documentElement;
+		const b = bodyFontById(custom.bodyFont);
+		if (custom.on && b.load) {
+			b.load();
+			html.style.setProperty('--body', b.family);
+		} else html.style.removeProperty('--body');
+		if (custom.on && custom.titleScale !== 1) html.style.setProperty('--title-scale', String(custom.titleScale));
+		else html.style.removeProperty('--title-scale');
+		html.classList.toggle('bw', custom.on && custom.bw);
+	});
+
 </script>
 
 <svelte:head>
@@ -43,7 +55,7 @@
 </svelte:head>
 
 <header>
-	<a class="home" href="/">{site.name}</a>
+	<a class="home" href="/">{view.name}</a>
 	<nav>
 		<a href="/gallery" class:on={page.url.pathname === '/gallery'}>work</a>
 		<a href="/commissions" class:on={page.url.pathname === '/commissions'}>commissions</a>
@@ -62,12 +74,16 @@
 
 {@render children()}
 
+{#if custom.on && custom.grain > 0}
+	<div class="grain" style:opacity={custom.grain}></div>
+{/if}
+
 {#if custom.panel}
 	<TryPanel />
 {/if}
 
 <footer>
-	<span>© {new Date().getFullYear()} {site.name.toLowerCase()}</span>
+	<span>© {new Date().getFullYear()} {view.name.toLowerCase()}</span>
 	<span>all art is mine, don't repost or use for ai</span>
 </footer>
 
@@ -89,7 +105,7 @@
 	:global(body) {
 		background: var(--paper);
 		color: var(--ink);
-		font-family: 'Archivo Variable', system-ui, sans-serif;
+		font-family: var(--body, 'Archivo Variable'), system-ui, sans-serif;
 		font-size: 15px;
 		line-height: 1.45;
 		min-height: 100dvh;
@@ -130,6 +146,19 @@
 	:global(::selection) {
 		background: var(--ink);
 		color: var(--paper);
+	}
+
+	:global(html.bw main img) {
+		filter: grayscale(1) !important;
+	}
+
+	.grain {
+		position: fixed;
+		inset: 0;
+		z-index: 15;
+		pointer-events: none;
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+		mix-blend-mode: multiply;
 	}
 
 	.bgimg {

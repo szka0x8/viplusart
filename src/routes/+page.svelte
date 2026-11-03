@@ -1,35 +1,41 @@
 <script lang="ts">
 	import { site, gallery, commissions } from '#lib/data.ts';
-	import { custom } from '#lib/custom.svelte.ts';
+	import { custom, view } from '#lib/custom.svelte.ts';
 	import Pic from '#lib/Pic.svelte';
 
 	let items = $derived(custom.on && custom.workPics.length ? custom.workPics : gallery);
 </script>
 
 <svelte:head>
-	<title>{site.name}</title>
+	<title>{view.name}</title>
 </svelte:head>
 
 <main>
-	<h1>{site.name}</h1>
+	<h1>{view.name}</h1>
 
 	<section class="intro">
-		<Pic
-			pic={site.avatar}
-			url={custom.on ? custom.avatarUrl : null}
-			alt={site.name}
-			sizes="(max-width: 700px) 100vw, 380px"
-			loading="eager"
-			fetchpriority="high"
-		/>
+		<div class="avatar {view.o.avatarShape}">
+			<Pic
+				pic={site.avatar}
+				url={custom.on ? custom.avatarUrl : null}
+				alt={view.name}
+				sizes="(max-width: 700px) 100vw, 380px"
+				loading="eager"
+				fetchpriority="high"
+			/>
+		</div>
 
 		<div class="about">
-			<p class="tags">{site.tags.join(' / ')}</p>
+			{#if view.o.showTags}
+				<p class="tags">{view.tags.join(' / ')}</p>
+			{/if}
 
-			<p class="status">
-				commissions are <b>{commissions.open ? 'open' : 'closed'}</b>
-				<a href="/commissions">see prices</a>
-			</p>
+			{#if view.o.showStatus}
+				<p class="status">
+					commissions are <b>{commissions.open ? 'open' : 'closed'}</b>
+					<a href="/commissions">see prices</a>
+				</p>
+			{/if}
 
 			<ul class="links">
 				{#each site.socials as s}
@@ -46,7 +52,7 @@
 		</div>
 	</section>
 
-	{#if items.length}
+	{#if items.length && view.o.showRecent}
 		<section class="recent">
 			<div class="head">
 				<h2>recent work</h2>
@@ -69,7 +75,7 @@
 	}
 
 	h1 {
-		font-size: clamp(44px, 8vw, 120px);
+		font-size: calc(clamp(44px, 8vw, 120px) * var(--title-scale, 1));
 		line-height: 0.85;
 		margin: 28px 0 32px;
 		word-break: break-word;
@@ -80,6 +86,20 @@
 		grid-template-columns: minmax(0, 380px) minmax(0, 1fr);
 		gap: clamp(24px, 4vw, 64px);
 		align-items: start;
+	}
+
+	.avatar :global(img) {
+		width: 100%;
+		aspect-ratio: 1;
+		object-fit: cover;
+	}
+
+	.avatar.round :global(img) {
+		border-radius: 50%;
+	}
+
+	.avatar.arch :global(img) {
+		border-radius: 50% 50% 0 0 / 40% 40% 0 0;
 	}
 
 	.about {

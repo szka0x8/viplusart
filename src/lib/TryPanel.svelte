@@ -1,54 +1,86 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { custom, save, reset } from './custom.svelte.ts';
-	import { fonts, fontById } from './fonts.ts';
-	import { commissions } from './data.ts';
+	import {
+		custom,
+		save,
+		reset,
+		design,
+		slots,
+		loadSlots,
+		saveSlot,
+		loadSlot,
+		shareLink
+	} from './custom.svelte.ts';
+	import { fonts, fontById, bodyFonts, bodyFontById } from './fonts.ts';
+	import { site, commissions } from './data.ts';
 
 	onMount(() => {
-		for (const f of fonts) f.load?.();
+		for (const f of [...fonts, ...bodyFonts]) f.load?.();
+		loadSlots();
 	});
 
 	const t = {
 		ru: {
 			title: 'настройки',
 			note: 'это видишь только ты',
+			tabs: { look: 'вид', text: 'текст', pics: 'картинки', pages: 'страницы', save: 'сохранить' },
 			start: 'начать с',
 			font: 'шрифт названия',
-			comm: 'комиссии',
-			pics: 'свои картинки',
-			avatar: 'аватар',
-			workPics: 'работы',
-			pieces: 'шт.',
-			clear: 'убрать',
-			picsNote: 'только для просмотра, пропадут после перезагрузки',
-			work: 'работы',
-			masonry: 'мозаика',
-			grid: 'сетка',
-			big: 'крупно',
-			cols: 'колонки',
-			tight: 'плотно',
-			normal: 'обычно',
-			wide: 'широко',
-			titles: 'подписи',
-			yes: 'да',
-			no: 'нет',
-			pictures: 'с картинками',
-			list: 'списком',
-			portrait: 'высокие',
-			square: 'квадрат',
-			asis: 'как есть',
+			bodyFont: 'шрифт текста',
+			size: 'размер названия',
+			colors: 'цвета',
 			bg: 'фон',
 			text: 'текст',
 			small: 'мелкий текст',
 			lines: 'линии',
-			pic: 'картинка',
-			none: 'нет',
-			choose: 'выбрать',
+			effects: 'эффекты',
+			bw: 'чёрно-белые картинки',
+			grain: 'зерно',
+			name: 'название',
+			tags: 'о тебе (через запятую)',
+			tiers: 'цены',
+			price: 'цена',
+			order: 'как заказать',
+			avatar: 'аватар',
+			shape: 'форма аватара',
+			square: 'квадрат',
+			round: 'круг',
+			arch: 'арка',
+			workPics: 'работы',
+			pieces: 'шт.',
+			comm: 'комиссии',
+			bgPic: 'картинка на фон',
 			visible: 'видимость',
 			blur: 'размытие',
-			remove: 'убрать',
-			picNote: 'картинка пропадёт после перезагрузки, отправь мне её файлом',
-			copy: 'скопировать',
+			choose: 'выбрать',
+			clear: 'убрать',
+			picsNote: 'картинки только для просмотра и пропадут после перезагрузки. отправь мне их файлами',
+			home: 'главная',
+			showTags: 'о тебе',
+			showStatus: 'статус комиссий',
+			showRecent: 'последние работы',
+			work: 'работы',
+			masonry: 'мозаика',
+			grid: 'сетка',
+			big: 'крупно',
+			cols: 'кол.',
+			tight: 'плотно',
+			normal: 'обычно',
+			wide: 'широко',
+			titles: 'подписи',
+			pictures: 'с картинками',
+			list: 'списком',
+			portrait: 'высокие',
+			asis: 'как есть',
+			yes: 'да',
+			no: 'нет',
+			versions: 'версии',
+			saveHere: 'сохранить в',
+			empty: 'пусто',
+			saved: 'сохранено',
+			shareNote: 'отправь мне ссылку, и я увижу всё как у тебя (кроме картинок)',
+			link: 'копировать ссылку',
+			json: 'копировать текстом',
 			copied: 'скопировано',
 			original: 'оригинал',
 			mine: 'моё',
@@ -58,43 +90,64 @@
 		en: {
 			title: 'settings',
 			note: 'only you see this',
+			tabs: { look: 'look', text: 'text', pics: 'pictures', pages: 'pages', save: 'save' },
 			start: 'start from',
 			font: 'title font',
-			comm: 'commissions',
-			pics: 'your pictures',
-			avatar: 'avatar',
-			workPics: 'work',
-			pieces: 'pcs',
-			clear: 'clear',
-			picsNote: 'preview only, gone after reload',
-			work: 'work',
-			masonry: 'mosaic',
-			grid: 'grid',
-			big: 'large',
-			cols: 'columns',
-			tight: 'tight',
-			normal: 'normal',
-			wide: 'wide',
-			titles: 'titles',
-			yes: 'on',
-			no: 'off',
-			pictures: 'with pictures',
-			list: 'as a list',
-			portrait: 'tall',
-			square: 'square',
-			asis: 'as is',
+			bodyFont: 'text font',
+			size: 'title size',
+			colors: 'colors',
 			bg: 'background',
 			text: 'text',
 			small: 'small text',
 			lines: 'lines',
-			pic: 'picture',
-			none: 'none',
-			choose: 'choose',
+			effects: 'effects',
+			bw: 'black & white pictures',
+			grain: 'grain',
+			name: 'name',
+			tags: 'about you (split with commas)',
+			tiers: 'prices',
+			price: 'price',
+			order: 'how to order',
+			avatar: 'avatar',
+			shape: 'avatar shape',
+			square: 'square',
+			round: 'round',
+			arch: 'arch',
+			workPics: 'work',
+			pieces: 'pcs',
+			comm: 'commissions',
+			bgPic: 'background picture',
 			visible: 'visible',
 			blur: 'blur',
-			remove: 'remove',
-			picNote: 'picture is gone after reload, send it to me as a file',
-			copy: 'copy',
+			choose: 'choose',
+			clear: 'clear',
+			picsNote: 'pictures are preview only and gone after reload. send them to me as files',
+			home: 'home',
+			showTags: 'about you',
+			showStatus: 'commission status',
+			showRecent: 'recent work',
+			work: 'work',
+			masonry: 'mosaic',
+			grid: 'grid',
+			big: 'large',
+			cols: 'col.',
+			tight: 'tight',
+			normal: 'normal',
+			wide: 'wide',
+			titles: 'titles',
+			pictures: 'with pictures',
+			list: 'as a list',
+			portrait: 'tall',
+			asis: 'as is',
+			yes: 'on',
+			no: 'off',
+			versions: 'versions',
+			saveHere: 'save to',
+			empty: 'empty',
+			saved: 'saved',
+			shareNote: 'send me the link and i see exactly what you made (except pictures)',
+			link: 'copy link',
+			json: 'copy as text',
 			copied: 'copied',
 			original: 'original',
 			mine: 'mine',
@@ -113,13 +166,24 @@
 	];
 
 	const colors = ['paper', 'ink', 'mute', 'line'] as const;
-	const names = { paper: 'bg', ink: 'text', mute: 'small', line: 'lines' } as const;
+	const colorNames = { paper: 'bg', ink: 'text', mute: 'small', line: 'lines' } as const;
+	const tabs = ['look', 'text', 'pics', 'pages', 'save'] as const;
 
 	let l = $derived(t[custom.lang]);
-	let copied = $state(false);
+	let flash = $state('');
 
 	function changed() {
 		custom.on = true;
+		save();
+	}
+
+	function setc<K extends keyof typeof custom>(k: K, v: (typeof custom)[K]) {
+		custom[k] = v;
+		changed();
+	}
+
+	function set<K extends keyof typeof custom>(k: K, v: (typeof custom)[K]) {
+		custom[k] = v;
 		save();
 	}
 
@@ -129,12 +193,9 @@
 		changed();
 	}
 
-	function pick(e: Event) {
-		const file = (e.currentTarget as HTMLInputElement).files?.[0];
-		if (!file) return;
-		if (custom.bg) URL.revokeObjectURL(custom.bg);
-		custom.bg = URL.createObjectURL(file);
-		custom.bgName = file.name;
+	function setTier(i: number, k: 'name' | 'price', v: string) {
+		custom.text.tiers[i] ??= { name: '', price: '' };
+		custom.text.tiers[i][k] = v;
 		changed();
 	}
 
@@ -142,10 +203,24 @@
 		return [...((e.currentTarget as HTMLInputElement).files ?? [])];
 	}
 
-	function pickAvatar(e: Event) {
+	function one(e: Event, prev: string | null) {
 		const [f] = files(e);
+		if (!f) return null;
+		if (prev) URL.revokeObjectURL(prev);
+		return f;
+	}
+
+	function pickBg(e: Event) {
+		const f = one(e, custom.bg);
 		if (!f) return;
-		if (custom.avatarUrl) URL.revokeObjectURL(custom.avatarUrl);
+		custom.bg = URL.createObjectURL(f);
+		custom.bgName = f.name;
+		changed();
+	}
+
+	function pickAvatar(e: Event) {
+		const f = one(e, custom.avatarUrl);
+		if (!f) return;
 		custom.avatarUrl = URL.createObjectURL(f);
 		changed();
 	}
@@ -162,54 +237,71 @@
 	}
 
 	function pickTier(e: Event, i: number) {
-		const [f] = files(e);
+		const f = one(e, custom.tierPics[i] ?? null);
 		if (!f) return;
-		const old = custom.tierPics[i];
-		if (old) URL.revokeObjectURL(old);
 		custom.tierPics[i] = URL.createObjectURL(f);
 		changed();
 	}
 
-	function removeBg() {
-		if (custom.bg) URL.revokeObjectURL(custom.bg);
-		custom.bg = null;
-		custom.bgName = '';
+	async function copy(what: 'link' | 'json') {
+		const d = design();
+		const out =
+			what === 'link'
+				? shareLink()
+				: JSON.stringify(
+						{
+							...d,
+							font: fontById(d.font).name,
+							bodyFont: bodyFontById(d.bodyFont).name,
+							images: {
+								background: custom.bgName || null,
+								avatar: !!custom.avatarUrl,
+								work: custom.workPics.map((p) => p.title),
+								commissions: custom.tierPics.map((p) => !!p)
+							}
+						},
+						null,
+						2
+					);
+		await navigator.clipboard.writeText(out);
+		flash = what;
+		setTimeout(() => (flash = ''), 1500);
 	}
 
-	async function copy() {
-		const out = {
-			background: custom.paper,
-			text: custom.ink,
-			smallText: custom.mute,
-			lines: custom.line,
-			font: fontById(custom.font).name,
-			work: {
-				layout: custom.workLayout,
-				columns: custom.workCols,
-				spacing: custom.workGap,
-				titles: custom.workTitles
-			},
-			commissions: custom.commLayout,
-			pictureShape: custom.commShape,
-			image: custom.bgName || null,
-			imageOpacity: custom.bgOpacity,
-			imageBlur: custom.bgBlur
-		};
-		await navigator.clipboard.writeText(JSON.stringify(out, null, 2));
-		copied = true;
-		setTimeout(() => (copied = false), 1500);
-	}
-
-	function setc<K extends keyof typeof custom>(k: K, v: (typeof custom)[K]) {
-		custom[k] = v;
-		changed();
-	}
-
-	function set<K extends keyof typeof custom>(k: K, v: (typeof custom)[K]) {
-		custom[k] = v;
-		save();
+	function storeSlot(k: 'A' | 'B' | 'C') {
+		saveSlot(k);
+		flash = k;
+		setTimeout(() => (flash = ''), 1200);
 	}
 </script>
+
+{#snippet seg<T>(values: readonly T[], current: T, pickv: (v: T) => void, label: (v: T) => string)}
+	<div class="seg">
+		{#each values as v}
+			<button class:on={current === v} onclick={() => pickv(v)}>{label(v)}</button>
+		{/each}
+	</div>
+{/snippet}
+
+{#snippet toggle(label: string, value: boolean, flip: (v: boolean) => void)}
+	<div class="row">
+		<span>{label}</span>
+		<span class="yn">
+			<button class:on={value} onclick={() => flip(true)}>{l.yes}</button>
+			<button class:on={!value} onclick={() => flip(false)}>{l.no}</button>
+		</span>
+	</div>
+{/snippet}
+
+{#snippet file(label: string, has: string, onpick: (e: Event) => void, onclear: (() => void) | null, multiple = false)}
+	<div class="row">
+		<span>{label}</span>
+		<span class="pair">
+			{#if onclear}<button class="link" onclick={onclear}>{l.clear}</button>{/if}
+			<span class="file">{has || l.choose}<input type="file" accept="image/*" {multiple} onchange={onpick} /></span>
+		</span>
+	</div>
+{/snippet}
 
 <aside class:closed={!custom.open}>
 	<div class="bar">
@@ -226,168 +318,184 @@
 	{#if custom.open}
 		<p class="note">{l.note}</p>
 
-		<div class="block">
-			<span class="label">{l.start}</span>
-			<div class="swatches">
-				{#each presets as p}
-					<button
-						title={p[custom.lang]}
-						style:background={p.paper}
-						style:color={p.ink}
-						onclick={() => apply(p)}
-					>
-						Aa
-					</button>
-				{/each}
-			</div>
-		</div>
-
-		<div class="block">
-			<span class="label">{l.font}</span>
-			<div class="fonts">
-				{#each fonts as f}
-					<button
-						class:on={custom.font === f.id}
-						style:font-family={f.family}
-						style:font-weight={f.weight}
-						style:font-stretch={f.stretch}
-						title={f.name}
-						onclick={() => {
-							custom.font = f.id;
-							changed();
-						}}
-					>
-						{f.name}
-					</button>
-				{/each}
-			</div>
-		</div>
-
-		<div class="block">
-			{#each colors as c}
-				<label class="row">
-					<span>{l[names[c]]}</span>
-					<span class="pick">
-						<input type="text" bind:value={custom[c]} oninput={changed} spellcheck="false" />
-						<input type="color" bind:value={custom[c]} oninput={changed} />
-					</span>
-				</label>
+		<nav class="tabs">
+			{#each tabs as tb}
+				<button class:on={custom.tab === tb} onclick={() => set('tab', tb)}>{l.tabs[tb]}</button>
 			{/each}
-		</div>
+		</nav>
 
-		<div class="block">
-			<span class="label">{l.work}</span>
-			<div class="seg">
-				{#each ['masonry', 'grid', 'big'] as const as v}
-					<button class:on={custom.workLayout === v} onclick={() => setc('workLayout', v)}>{l[v]}</button>
-				{/each}
-			</div>
-			{#if custom.workLayout !== 'big'}
-				<div class="seg">
-					{#each [2, 3, 4] as const as v}
-						<button class:on={custom.workCols === v} onclick={() => setc('workCols', v)}>{v} {l.cols}</button>
+		<div class="body">
+			{#if custom.tab === 'look'}
+				<span class="label">{l.start}</span>
+				<div class="swatches">
+					{#each presets as p}
+						<button title={p[custom.lang]} style:background={p.paper} style:color={p.ink} onclick={() => apply(p)}>Aa</button>
 					{/each}
 				</div>
-			{/if}
-			<div class="seg">
-				{#each ['tight', 'normal', 'wide'] as const as v}
-					<button class:on={custom.workGap === v} onclick={() => setc('workGap', v)}>{l[v]}</button>
-				{/each}
-			</div>
-			<div class="seg">
-				<span class="segl">{l.titles}</span>
-				<button class:on={custom.workTitles} onclick={() => setc('workTitles', true)}>{l.yes}</button>
-				<button class:on={!custom.workTitles} onclick={() => setc('workTitles', false)}>{l.no}</button>
-			</div>
-			<a class="link go" href="/gallery">→ {l.work}</a>
-		</div>
 
-		<div class="block">
-			<span class="label">{l.comm}</span>
-			<div class="seg">
-				{#each ['pictures', 'list'] as const as v}
-					<button
-						class:on={custom.commLayout === v}
-						onclick={() => {
-							custom.commLayout = v;
-							changed();
-						}}>{l[v]}</button
-					>
+				<span class="label">{l.colors}</span>
+				{#each colors as c}
+					<label class="row">
+						<span>{l[colorNames[c]]}</span>
+						<span class="pick">
+							<input type="text" bind:value={custom[c]} oninput={changed} spellcheck="false" />
+							<input type="color" bind:value={custom[c]} oninput={changed} />
+						</span>
+					</label>
 				{/each}
-			</div>
-			{#if custom.commLayout === 'pictures'}
-				<div class="seg">
-					{#each ['portrait', 'square', 'original'] as const as v}
+
+				<span class="label">{l.font}</span>
+				<div class="fonts">
+					{#each fonts as f}
 						<button
-							class:on={custom.commShape === v}
-							onclick={() => {
-								custom.commShape = v;
-								changed();
-							}}>{l[v === 'original' ? 'asis' : v]}</button
+							class:on={custom.font === f.id}
+							style:font-family={f.family}
+							style:font-weight={f.weight}
+							style:font-stretch={f.stretch}
+							title={f.name}
+							onclick={() => setc('font', f.id)}>{f.name}</button
 						>
 					{/each}
 				</div>
-			{/if}
-			<a class="link go" href="/commissions">→ {l.comm}</a>
-		</div>
+				<label class="row">
+					<span>{l.size}</span>
+					<input type="range" min="0.4" max="1.8" step="0.05" bind:value={custom.titleScale} oninput={changed} />
+				</label>
 
-		<div class="block">
-			<span class="label">{l.pics}</span>
-			<div class="row">
-				<span>{l.avatar}</span>
-				<span class="pair">
-					{#if custom.avatarUrl}<button class="link" onclick={() => (custom.avatarUrl = null)}>{l.clear}</button>{/if}
-					<span class="file">{custom.avatarUrl ? '✓' : l.choose}<input type="file" accept="image/*" onchange={pickAvatar} /></span>
-				</span>
-			</div>
-			<div class="row">
-				<span>{l.workPics}</span>
-				<span class="pair">
-					{#if custom.workPics.length}<button class="link" onclick={() => (custom.workPics = [])}>{l.clear}</button>{/if}
-					<span class="file">
-						{custom.workPics.length ? `${custom.workPics.length} ${l.pieces}` : l.choose}
-						<input type="file" accept="image/*" multiple onchange={pickWork} />
-					</span>
-				</span>
-			</div>
-			{#each commissions.tiers as t, i}
-				<div class="row">
-					<span>{l.comm} {i + 1}</span>
-					<span class="pair">
-						{#if custom.tierPics[i]}<button class="link" onclick={() => (custom.tierPics[i] = null)}>{l.clear}</button>{/if}
-						<span class="file">{custom.tierPics[i] ? '✓' : l.choose}<input type="file" accept="image/*" onchange={(e) => pickTier(e, i)} /></span>
-					</span>
+				<span class="label">{l.bodyFont}</span>
+				<div class="fonts">
+					{#each bodyFonts as f}
+						<button
+							class="plain"
+							class:on={custom.bodyFont === f.id}
+							style:font-family={f.family}
+							onclick={() => setc('bodyFont', f.id)}>{f.name}</button
+						>
+					{/each}
 				</div>
-			{/each}
-			<p class="note">{l.picsNote}</p>
-		</div>
 
-		<div class="block">
-			<div class="row">
-				<span>{l.pic}</span>
-				<span class="file">
-					{custom.bgName || l.choose}
-					<input type="file" accept="image/*" onchange={pick} />
-				</span>
-			</div>
-			{#if custom.bg}
+				<span class="label">{l.effects}</span>
+				{@render toggle(l.bw, custom.bw, (v) => setc('bw', v))}
 				<label class="row">
-					<span>{l.visible}</span>
-					<input type="range" min="0.05" max="1" step="0.05" bind:value={custom.bgOpacity} oninput={changed} />
+					<span>{l.grain}</span>
+					<input type="range" min="0" max="0.5" step="0.02" bind:value={custom.grain} oninput={changed} />
 				</label>
-				<label class="row">
-					<span>{l.blur}</span>
-					<input type="range" min="0" max="30" step="1" bind:value={custom.bgBlur} oninput={changed} />
+			{:else if custom.tab === 'text'}
+				<label class="field">
+					<span>{l.name}</span>
+					<input type="text" bind:value={custom.text.name} oninput={changed} placeholder={site.name} />
 				</label>
-				<div class="row">
-					<span class="note">{l.picNote}</span>
-					<button class="link" onclick={removeBg}>{l.remove}</button>
+				<label class="field">
+					<span>{l.tags}</span>
+					<input type="text" bind:value={custom.text.tags} oninput={changed} placeholder={site.tags.join(', ')} />
+				</label>
+
+				<span class="label">{l.tiers}</span>
+				{#each commissions.tiers as tr, i}
+					<div class="tier">
+						<input
+							type="text"
+							bind:value={() => custom.text.tiers[i]?.name ?? '', (v) => setTier(i, 'name', v)}
+							placeholder={tr.name}
+						/>
+						<input
+							class="price"
+							type="text"
+							bind:value={() => custom.text.tiers[i]?.price ?? '', (v) => setTier(i, 'price', v)}
+							placeholder={String(tr.price)}
+						/>
+					</div>
+				{/each}
+
+				<label class="field">
+					<span>{l.order}</span>
+					<textarea rows="2" bind:value={custom.text.note} oninput={changed} placeholder={commissions.note}></textarea>
+				</label>
+			{:else if custom.tab === 'pics'}
+				{@render file(l.avatar, custom.avatarUrl ? '✓' : '', pickAvatar, custom.avatarUrl ? () => (custom.avatarUrl = null) : null)}
+				<span class="label">{l.shape}</span>
+				{@render seg(['square', 'round', 'arch'] as const, custom.avatarShape, (v) => setc('avatarShape', v), (v) => l[v])}
+
+				<span class="label">{l.workPics} / {l.comm}</span>
+				{@render file(
+					l.workPics,
+					custom.workPics.length ? `${custom.workPics.length} ${l.pieces}` : '',
+					pickWork,
+					custom.workPics.length ? () => (custom.workPics = []) : null,
+					true
+				)}
+				{#each commissions.tiers as _, i}
+					{@render file(
+						`${l.comm} ${i + 1}`,
+						custom.tierPics[i] ? '✓' : '',
+						(e) => pickTier(e, i),
+						custom.tierPics[i] ? () => (custom.tierPics[i] = null) : null
+					)}
+				{/each}
+
+				<span class="label">{l.bgPic}</span>
+				{@render file(l.bgPic, custom.bgName, pickBg, custom.bg ? () => ((custom.bg = null), (custom.bgName = '')) : null)}
+				{#if custom.bg}
+					<label class="row">
+						<span>{l.visible}</span>
+						<input type="range" min="0.05" max="1" step="0.05" bind:value={custom.bgOpacity} oninput={changed} />
+					</label>
+					<label class="row">
+						<span>{l.blur}</span>
+						<input type="range" min="0" max="30" step="1" bind:value={custom.bgBlur} oninput={changed} />
+					</label>
+				{/if}
+				<p class="note">{l.picsNote}</p>
+			{:else if custom.tab === 'pages'}
+				<span class="label">{l.home} <a class="link" href="/">→</a></span>
+				{@render toggle(l.showTags, custom.showTags, (v) => setc('showTags', v))}
+				{@render toggle(l.showStatus, custom.showStatus, (v) => setc('showStatus', v))}
+				{@render toggle(l.showRecent, custom.showRecent, (v) => setc('showRecent', v))}
+
+				<span class="label">{l.work} <a class="link" href="/gallery">→</a></span>
+				{@render seg(['masonry', 'grid', 'big'] as const, custom.workLayout, (v) => setc('workLayout', v), (v) => l[v])}
+				{#if custom.workLayout !== 'big'}
+					{@render seg([2, 3, 4] as const, custom.workCols, (v) => setc('workCols', v), (v) => `${v} ${l.cols}`)}
+				{/if}
+				{@render seg(['tight', 'normal', 'wide'] as const, custom.workGap, (v) => setc('workGap', v), (v) => l[v])}
+				{@render toggle(l.titles, custom.workTitles, (v) => setc('workTitles', v))}
+
+				<span class="label">{l.comm} <a class="link" href="/commissions">→</a></span>
+				{@render seg(['pictures', 'list'] as const, custom.commLayout, (v) => setc('commLayout', v), (v) => l[v])}
+				{#if custom.commLayout === 'pictures'}
+					{@render seg(
+						['portrait', 'square', 'original'] as const,
+						custom.commShape,
+						(v) => setc('commShape', v),
+						(v) => l[v === 'original' ? 'asis' : v]
+					)}
+				{/if}
+			{:else if custom.tab === 'save'}
+				<span class="label">{l.versions}</span>
+				{#each ['A', 'B', 'C'] as const as k}
+					<div class="row">
+						<button class="slot" disabled={!slots[k]} onclick={() => loadSlot(k)}>
+							<b>{k}</b>
+							{#if slots[k]}
+								<i style:background={slots[k]!.paper} style:border-color={slots[k]!.ink}></i>
+							{:else}
+								<span class="note">{l.empty}</span>
+							{/if}
+						</button>
+						<button class="link" onclick={() => storeSlot(k)}>{flash === k ? l.saved : `${l.saveHere} ${k}`}</button>
+					</div>
+				{/each}
+
+				<span class="label">{l.link}</span>
+				<p class="note">{l.shareNote}</p>
+				<div class="share">
+					<button class="copy" onclick={() => copy('link')}>{flash === 'link' ? l.copied : l.link}</button>
+					<button class="link" onclick={() => copy('json')}>{flash === 'json' ? l.copied : l.json}</button>
 				</div>
 			{/if}
 		</div>
 
 		<div class="actions">
-			<button class="copy" onclick={copy}>{copied ? l.copied : l.copy}</button>
 			<button class="link" onclick={() => set('on', !custom.on)}>{custom.on ? l.original : l.mine}</button>
 			<button class="link" onclick={reset}>{l.reset}</button>
 			<button class="link" onclick={() => set('panel', false)}>{l.close}</button>
@@ -400,20 +508,22 @@
 		position: fixed;
 		right: 16px;
 		bottom: 16px;
-		width: 270px;
+		width: 300px;
 		max-height: calc(100dvh - 32px);
-		overflow: auto;
+		display: flex;
+		flex-direction: column;
 		z-index: 20;
 		background: #fff;
 		color: #111;
 		border: 1px solid #111;
+		font-family: 'Archivo Variable', system-ui, sans-serif;
 		font-size: 13px;
+		line-height: 1.35;
 		padding: 10px 12px 12px;
 	}
 
 	aside.closed {
 		width: auto;
-		padding-bottom: 10px;
 	}
 
 	button {
@@ -423,6 +533,10 @@
 		font: inherit;
 		color: inherit;
 		cursor: pointer;
+	}
+
+	button:disabled {
+		cursor: default;
 	}
 
 	.bar {
@@ -447,19 +561,44 @@
 	.note {
 		color: #888;
 		font-size: 12px;
-		margin-top: 2px;
+		margin: 2px 0 0;
 	}
 
-	.block {
+	.tabs {
+		display: flex;
+		justify-content: space-between;
+		gap: 6px;
 		margin-top: 10px;
-		padding-top: 8px;
-		border-top: 1px solid #e5e5e5;
+		border-bottom: 1px solid #e5e5e5;
+	}
+
+	.tabs button {
+		padding: 4px 0 6px;
+		color: #888;
+		border-bottom: 2px solid transparent;
+		margin-bottom: -1px;
+	}
+
+	.tabs button.on {
+		color: #111;
+		border-color: #111;
+		font-weight: 700;
+	}
+
+	.body {
+		overflow: auto;
+		padding-top: 4px;
+		min-height: 0;
 	}
 
 	.label {
 		display: block;
 		color: #888;
-		margin-bottom: 6px;
+		margin: 12px 0 6px;
+	}
+
+	.label a {
+		margin-left: 4px;
 	}
 
 	.swatches {
@@ -469,7 +608,7 @@
 
 	.swatches button {
 		flex: 1;
-		height: 30px;
+		height: 28px;
 		border: 1px solid #ccc;
 		font-weight: 700;
 		font-size: 12px;
@@ -495,13 +634,21 @@
 		text-overflow: ellipsis;
 	}
 
-	.fonts button:hover {
+	.fonts button.plain {
+		font-size: 13px;
+	}
+
+	.fonts button:hover,
+	.seg button:hover {
 		border-color: #888;
 	}
 
-	.fonts button.on {
+	.fonts button.on,
+	.seg button.on,
+	.yn button.on {
 		border-color: #111;
 		background: #f2f2f2;
+		font-weight: 700;
 	}
 
 	.seg {
@@ -516,27 +663,14 @@
 		padding: 5px 4px;
 	}
 
-	.pair {
+	.yn {
 		display: flex;
-		gap: 10px;
-		align-items: center;
+		gap: 4px;
 	}
 
-	.segl {
-		flex: 1;
-		color: #888;
-		align-self: center;
-	}
-
-	.seg button.on {
-		border-color: #111;
-		background: #f2f2f2;
-		font-weight: 700;
-	}
-
-	.go {
-		display: inline-block;
-		margin-top: 4px;
+	.yn button {
+		border: 1px solid #ddd;
+		padding: 2px 10px;
 	}
 
 	.row {
@@ -547,21 +681,40 @@
 		padding: 3px 0;
 	}
 
-	.pick {
+	.pick,
+	.pair,
+	.share {
 		display: flex;
 		align-items: center;
-		gap: 6px;
+		gap: 8px;
 	}
 
-	input[type='text'] {
-		width: 72px;
+	.share {
+		gap: 14px;
+		margin-top: 8px;
+	}
+
+	input[type='text'],
+	textarea {
 		font: inherit;
-		font-family: ui-monospace, monospace;
-		font-size: 12px;
+		color: inherit;
+		background: none;
 		border: none;
 		border-bottom: 1px solid #ddd;
+		padding: 3px 0;
+	}
+
+	input[type='text']:focus,
+	textarea:focus {
+		outline: none;
+		border-color: #111;
+	}
+
+	.pick input[type='text'] {
+		width: 72px;
+		font-family: ui-monospace, monospace;
+		font-size: 12px;
 		text-align: right;
-		padding: 2px 0;
 	}
 
 	input[type='color'] {
@@ -574,8 +727,39 @@
 	}
 
 	input[type='range'] {
-		width: 130px;
+		width: 140px;
 		accent-color: #111;
+	}
+
+	.field {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		margin-top: 10px;
+		color: #888;
+	}
+
+	.field input,
+	.field textarea {
+		color: #111;
+		width: 100%;
+		resize: vertical;
+	}
+
+	.tier {
+		display: flex;
+		gap: 8px;
+		margin-bottom: 4px;
+	}
+
+	.tier input {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.tier .price {
+		flex: 0 0 60px;
+		text-align: right;
 	}
 
 	.file {
@@ -594,19 +778,21 @@
 		cursor: pointer;
 	}
 
+	.slot {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.slot i {
+		width: 34px;
+		height: 18px;
+		border: 2px solid;
+	}
+
 	.link {
 		text-decoration: underline;
 		color: #555;
-	}
-
-	.actions {
-		display: flex;
-		align-items: center;
-		gap: 12px;
-		flex-wrap: wrap;
-		margin-top: 12px;
-		padding-top: 10px;
-		border-top: 1px solid #e5e5e5;
 	}
 
 	.copy {
@@ -615,13 +801,23 @@
 		padding: 5px 10px;
 	}
 
+	.actions {
+		display: flex;
+		align-items: center;
+		gap: 14px;
+		flex-wrap: wrap;
+		margin-top: 10px;
+		padding-top: 8px;
+		border-top: 1px solid #e5e5e5;
+	}
+
 	@media (max-width: 520px) {
 		aside {
 			left: 8px;
 			right: 8px;
 			bottom: 8px;
 			width: auto;
-			max-height: 55dvh;
+			max-height: 60dvh;
 		}
 	}
 </style>
