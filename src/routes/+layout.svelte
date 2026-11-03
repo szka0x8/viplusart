@@ -28,9 +28,7 @@
 </svelte:head>
 
 <header>
-	{#if page.url.pathname !== '/'}
 		<a class="home" href="/">{site.name}</a>
-	{/if}
 	<nav>
 		<a href="/gallery" class:on={page.url.pathname === '/gallery'}>work</a>
 		<a href="/commissions" class:on={page.url.pathname === '/commissions'}>commissions</a>

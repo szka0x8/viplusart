@@ -29,7 +29,7 @@ export const gallery = Object.keys(art)
 export type GalleryItem = (typeof gallery)[number];
 
 export const site = {
-	name: 'ARTIST',
+	name: 'viplusart',
 	tags: ['she/her', 'illustrator'],
 	avatar,
 	email: 'artist@example.com',
