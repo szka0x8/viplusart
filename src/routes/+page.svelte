@@ -124,7 +124,7 @@
 	.links {
 		list-style: none;
 		padding: 0;
-		border-top: 1px solid var(--ink);
+		border-top: 1px solid var(--rule);
 	}
 
 	.links a {
@@ -149,7 +149,7 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: baseline;
-		border-bottom: 1px solid var(--ink);
+		border-bottom: 1px solid var(--rule);
 		padding-bottom: 8px;
 		margin-bottom: 14px;
 	}

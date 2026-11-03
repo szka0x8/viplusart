@@ -42,14 +42,22 @@
 		return '#' + [f(0), f(8), f(4)].map((x) => x.toString(16).padStart(2, '0')).join('');
 	}
 
+	let last = '';
+
 	$effect.pre(() => {
-		if (toHex(h, s, l) === value.toLowerCase()) return;
+		if (value === last) return;
 		const v = toHsl(value);
 		if (v) [h, s, l] = v;
+		last = value;
 	});
 
-	function slide() {
-		value = toHex(h, s, l);
+	function slide(k: 'h' | 's' | 'l', e: Event) {
+		const n = (e.currentTarget as HTMLInputElement).valueAsNumber;
+		if (k === 'h') h = n;
+		else if (k === 's') s = n;
+		else l = n;
+		last = toHex(h, s, l);
+		value = last;
 		onchange?.();
 	}
 
@@ -74,8 +82,8 @@
 				type="range"
 				min="0"
 				max="360"
-				bind:value={h}
-				oninput={slide}
+				value={h}
+				oninput={(e) => slide('h', e)}
 				style:background="linear-gradient(to right, {[0, 60, 120, 180, 240, 300, 360]
 					.map((x) => `hsl(${x} ${s}% ${l}%)`)
 					.join(', ')})"
@@ -84,16 +92,16 @@
 				type="range"
 				min="0"
 				max="100"
-				bind:value={s}
-				oninput={slide}
+				value={s}
+				oninput={(e) => slide('s', e)}
 				style:background="linear-gradient(to right, hsl({h} 0% {l}%), hsl({h} 100% {l}%))"
 			/>
 			<input
 				type="range"
 				min="0"
 				max="100"
-				bind:value={l}
-				oninput={slide}
+				value={l}
+				oninput={(e) => slide('l', e)}
 				style:background="linear-gradient(to right, #000, hsl({h} {s}% 50%), #fff)"
 			/>
 			<div class="quick">

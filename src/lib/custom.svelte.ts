@@ -6,6 +6,7 @@ export const defaults = {
 	ink: '#151515',
 	mute: '#77736b',
 	line: '#d3cec4',
+	rule: '#151515',
 	bgOpacity: 0.35,
 	bgBlur: 4,
 	font: 'archivo',

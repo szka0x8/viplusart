@@ -34,7 +34,8 @@
 			bg: 'фон',
 			text: 'текст',
 			small: 'мелкий текст',
-			lines: 'линии',
+			rules: 'главные линии',
+			lines: 'тонкие линии',
 			effects: 'эффекты',
 			bw: 'чёрно-белые картинки',
 			grain: 'зерно',
@@ -101,7 +102,8 @@
 			bg: 'background',
 			text: 'text',
 			small: 'small text',
-			lines: 'lines',
+			rules: 'main lines',
+			lines: 'thin lines',
 			effects: 'effects',
 			bw: 'black & white pictures',
 			grain: 'grain',
@@ -167,8 +169,8 @@
 		{ ru: 'ночь', en: 'night', paper: '#151a24', ink: '#e6e9f0', mute: '#8a93a6', line: '#2a3142' }
 	];
 
-	const colors = ['paper', 'ink', 'mute', 'line'] as const;
-	const colorNames = { paper: 'bg', ink: 'text', mute: 'small', line: 'lines' } as const;
+	const colors = ['paper', 'ink', 'mute', 'rule', 'line'] as const;
+	const colorNames = { paper: 'bg', ink: 'text', mute: 'small', rule: 'rules', line: 'lines' } as const;
 	const tabs = ['look', 'text', 'pics', 'pages', 'save'] as const;
 
 	let l = $derived(t[custom.lang]);
@@ -191,7 +193,7 @@
 
 	function apply(p: (typeof presets)[number]) {
 		const { ru, en, ...c } = p;
-		Object.assign(custom, c);
+		Object.assign(custom, c, { rule: c.ink });
 		changed();
 	}
 

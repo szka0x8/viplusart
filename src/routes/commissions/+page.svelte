@@ -87,7 +87,7 @@
 		display: grid;
 		grid-template-columns: repeat(3, 1fr);
 		gap: 16px;
-		border-top: 1px solid var(--ink);
+		border-top: 1px solid var(--rule);
 		padding-top: 16px;
 		align-items: start;
 	}
@@ -122,7 +122,7 @@
 	.list {
 		list-style: none;
 		padding: 0;
-		border-top: 1px solid var(--ink);
+		border-top: 1px solid var(--rule);
 		max-width: 640px;
 	}
 
@@ -138,7 +138,7 @@
 
 	.list i {
 		flex: 1;
-		border-bottom: 1px dotted var(--mute);
+		border-bottom: 1px dotted var(--rule);
 	}
 
 	.order {

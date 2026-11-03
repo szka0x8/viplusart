@@ -16,7 +16,7 @@
 
 	$effect(() => {
 		const root = document.documentElement.style;
-		for (const k of ['paper', 'ink', 'mute', 'line'] as const) {
+		for (const k of ['paper', 'ink', 'mute', 'line', 'rule'] as const) {
 			if (custom.on) root.setProperty(`--${k}`, custom[k]);
 			else root.removeProperty(`--${k}`);
 		}
@@ -94,6 +94,7 @@
 		--ink: #151515;
 		--mute: #77736b;
 		--line: #d3cec4;
+		--rule: var(--ink);
 		--pad: clamp(16px, 4vw, 48px);
 	}
 
@@ -176,7 +177,7 @@
 		justify-content: space-between;
 		align-items: baseline;
 		padding: 18px var(--pad);
-		border-bottom: 1px solid var(--ink);
+		border-bottom: 1px solid var(--rule);
 	}
 
 	.home {
