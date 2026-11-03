@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { site } from '#lib/data.ts';
+	import { site, gallery, commissions } from '#lib/data.ts';
 </script>
 
 <svelte:head>
@@ -9,26 +9,151 @@
 <main>
 	<h1>{site.name}</h1>
 
-	<enhanced:img src={site.avatar} alt={site.name} sizes="300px" />
+	<section class="intro">
+		<enhanced:img src={site.avatar} alt={site.name} sizes="(max-width: 700px) 100vw, 380px" />
 
-	<ul>
-		{#each site.tags as tag}
-			<li>{tag}</li>
-		{/each}
-	</ul>
+		<div class="about">
+			<p class="tags">{site.tags.join(' / ')}</p>
 
-	<nav>
-		<a href="/commissions">commissions</a>
-		<a href="/gallery">gallery</a>
-	</nav>
+			<p class="status">
+				commissions are <b>{commissions.open ? 'open' : 'closed'}</b>
+				<a href="/commissions">see prices</a>
+			</p>
 
-	<p>business e-mail: <a href="mailto:{site.email}">{site.email}</a></p>
+			<ul class="links">
+				{#each site.socials as s}
+					<li>
+						<a href={s.url} target="_blank" rel="noreferrer">
+							<span>{s.name.toLowerCase()}</span><span>↗</span>
+						</a>
+					</li>
+				{/each}
+				<li>
+					<a href="mailto:{site.email}"><span>{site.email}</span><span>✉</span></a>
+				</li>
+			</ul>
+		</div>
+	</section>
 
-	<nav>
-		{#each site.socials as s}
-			<a href={s.url} target="_blank" rel="noreferrer" aria-label={s.name}>
-				<svg viewBox="0 0 24 24" width="24" height="24"><path d={s.icon.path} /></svg>
-			</a>
-		{/each}
-	</nav>
+	{#if gallery.length}
+		<section class="recent">
+			<div class="head">
+				<h2>recent work</h2>
+				<a href="/gallery">all work →</a>
+			</div>
+			<div class="strip">
+				{#each gallery.slice(-4).reverse() as item}
+					<a href="/gallery" aria-label={item.title}>
+						<enhanced:img src={item.pic} alt={item.title} sizes="(max-width: 700px) 50vw, 25vw" loading="lazy" />
+					</a>
+				{/each}
+			</div>
+		</section>
+	{/if}
 </main>
+
+<style>
+	main {
+		padding: 0 var(--pad) 64px;
+	}
+
+	h1 {
+		font-size: clamp(64px, 17vw, 260px);
+		font-weight: 900;
+		font-stretch: 125%;
+		line-height: 0.85;
+		letter-spacing: -0.03em;
+		margin: 28px 0 32px;
+		word-break: break-word;
+	}
+
+	.intro {
+		display: grid;
+		grid-template-columns: minmax(0, 380px) minmax(0, 1fr);
+		gap: clamp(24px, 4vw, 64px);
+		align-items: start;
+	}
+
+	.about {
+		display: flex;
+		flex-direction: column;
+		gap: 22px;
+		max-width: 520px;
+	}
+
+	.tags {
+		font-size: 22px;
+		font-stretch: 85%;
+		font-weight: 600;
+	}
+
+	.status a {
+		margin-left: 8px;
+		color: var(--mute);
+	}
+
+	.links {
+		list-style: none;
+		padding: 0;
+		border-top: 1px solid var(--ink);
+	}
+
+	.links a {
+		display: flex;
+		justify-content: space-between;
+		padding: 11px 0;
+		border-bottom: 1px solid var(--line);
+		text-decoration: none;
+		font-size: 17px;
+	}
+
+	.links a:hover {
+		padding-left: 8px;
+		transition: padding 0.15s;
+	}
+
+	.recent {
+		margin-top: 72px;
+	}
+
+	.head {
+		display: flex;
+		justify-content: space-between;
+		align-items: baseline;
+		border-bottom: 1px solid var(--ink);
+		padding-bottom: 8px;
+		margin-bottom: 14px;
+	}
+
+	h2 {
+		font-size: 15px;
+		font-weight: 700;
+	}
+
+	.strip {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		gap: 12px;
+	}
+
+	.strip a :global(img) {
+		width: 100%;
+		aspect-ratio: 4 / 5;
+		object-fit: cover;
+		filter: grayscale(0.2);
+		transition: filter 0.2s;
+	}
+
+	.strip a:hover :global(img) {
+		filter: none;
+	}
+
+	@media (max-width: 700px) {
+		.intro {
+			grid-template-columns: 1fr;
+		}
+		.strip {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+</style>

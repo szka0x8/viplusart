@@ -30,7 +30,7 @@ export type GalleryItem = (typeof gallery)[number];
 
 export const site = {
 	name: 'ARTIST',
-	tags: ['she/her', 'illustrator', 'commissions open'],
+	tags: ['she/her', 'illustrator'],
 	avatar,
 	email: 'artist@example.com',
 	socials: [
