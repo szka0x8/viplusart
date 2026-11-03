@@ -97,6 +97,10 @@
 		opacity: 1;
 	}
 
+	:global(html.js img.now) {
+		transition: none;
+	}
+
 	:global(::selection) {
 		background: var(--ink);
 		color: var(--paper);
