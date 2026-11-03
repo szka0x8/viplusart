@@ -88,6 +88,15 @@
 		display: block;
 	}
 
+	:global(html.js img) {
+		opacity: 0;
+		transition: opacity 0.5s ease;
+	}
+
+	:global(html.js img.in) {
+		opacity: 1;
+	}
+
 	:global(::selection) {
 		background: var(--ink);
 		color: var(--paper);

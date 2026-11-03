@@ -10,7 +10,7 @@
 	<h1>{site.name}</h1>
 
 	<section class="intro">
-		<enhanced:img src={site.avatar} alt={site.name} sizes="(max-width: 700px) 100vw, 380px" />
+		<enhanced:img src={site.avatar} alt={site.name} sizes="(max-width: 700px) 100vw, 380px" fetchpriority="high" />
 
 		<div class="about">
 			<p class="tags">{site.tags.join(' / ')}</p>

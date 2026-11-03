@@ -10,6 +10,12 @@
 					localStorage.getItem('theme') ??
 					(matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
 			} catch {}
+
+			document.documentElement.classList.add('js');
+			for (const ev of ['load', 'error'])
+				document.addEventListener(ev, (e) => {
+					if (e.target instanceof HTMLImageElement) e.target.classList.add('in');
+				}, true);
 		</script>
 		%sveltekit.head%
 	</head>
