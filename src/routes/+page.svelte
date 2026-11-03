@@ -1,5 +1,9 @@
 <script lang="ts">
 	import { site, gallery, commissions } from '#lib/data.ts';
+	import { custom } from '#lib/custom.svelte.ts';
+	import Pic from '#lib/Pic.svelte';
+
+	let items = $derived(custom.on && custom.workPics.length ? custom.workPics : gallery);
 </script>
 
 <svelte:head>
@@ -10,7 +14,14 @@
 	<h1>{site.name}</h1>
 
 	<section class="intro">
-		<enhanced:img src={site.avatar} alt={site.name} sizes="(max-width: 700px) 100vw, 380px" fetchpriority="high" />
+		<Pic
+			pic={site.avatar}
+			url={custom.on ? custom.avatarUrl : null}
+			alt={site.name}
+			sizes="(max-width: 700px) 100vw, 380px"
+			loading="eager"
+			fetchpriority="high"
+		/>
 
 		<div class="about">
 			<p class="tags">{site.tags.join(' / ')}</p>
@@ -35,16 +46,16 @@
 		</div>
 	</section>
 
-	{#if gallery.length}
+	{#if items.length}
 		<section class="recent">
 			<div class="head">
 				<h2>recent work</h2>
 				<a href="/gallery">all work →</a>
 			</div>
 			<div class="strip">
-				{#each gallery.slice(-4).reverse() as item}
+				{#each items.slice(-4).reverse() as item}
 					<a href="/gallery" aria-label={item.title}>
-						<enhanced:img src={item.pic} alt={item.title} sizes="(max-width: 700px) 50vw, 25vw" loading="lazy" />
+						<Pic {...item} alt={item.title} sizes="(max-width: 700px) 50vw, 25vw" />
 					</a>
 				{/each}
 			</div>
@@ -59,10 +70,7 @@
 
 	h1 {
 		font-size: clamp(44px, 8vw, 120px);
-		font-weight: 900;
-		font-stretch: 125%;
 		line-height: 0.85;
-		letter-spacing: -0.03em;
 		margin: 28px 0 32px;
 		word-break: break-word;
 	}

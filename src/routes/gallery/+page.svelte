@@ -1,6 +1,12 @@
 <script lang="ts">
 	import { site, gallery } from '#lib/data.ts';
 	import Lightbox from '#lib/Lightbox.svelte';
+	import { custom, defaults } from '#lib/custom.svelte.ts';
+	import Pic from '#lib/Pic.svelte';
+
+	let o = $derived(custom.on ? custom : defaults);
+	let items = $derived(custom.on && custom.workPics.length ? custom.workPics : gallery);
+	const gaps = { tight: '4px', normal: '16px', wide: '36px' };
 
 	let open: number | null = $state(null);
 </script>
@@ -12,25 +18,31 @@
 <main>
 	<div class="head">
 		<h1>work</h1>
-		<span>{gallery.length} pieces</span>
+		<span>{items.length} pieces</span>
 	</div>
 
-	<div class="grid">
-		{#each gallery as item, i}
+	<div
+		class="grid {o.workLayout}"
+		style:--cols={o.workCols}
+		style:--gap={gaps[o.workGap]}
+	>
+		{#each items as item, i}
 			<figure>
 				<button onclick={() => (open = i)} aria-label={item.title}>
-					<enhanced:img src={item.pic} alt={item.title} sizes="(max-width: 700px) 100vw, 33vw" loading="lazy" />
+					<Pic {...item} alt={item.title} sizes="(max-width: 700px) 100vw, 33vw" />
 				</button>
-				<figcaption>
-					<span>{item.title}</span>
-					<span>{String(i + 1).padStart(2, '0')}</span>
-				</figcaption>
+				{#if o.workTitles}
+					<figcaption>
+						<span>{item.title}</span>
+						<span>{String(i + 1).padStart(2, '0')}</span>
+					</figcaption>
+				{/if}
 			</figure>
 		{/each}
 	</div>
 </main>
 
-<Lightbox items={gallery} bind:index={open} />
+<Lightbox {items} bind:index={open} />
 
 <style>
 	main {
@@ -46,24 +58,39 @@
 
 	h1 {
 		font-size: clamp(48px, 9vw, 120px);
-		font-weight: 900;
-		font-stretch: 125%;
 		line-height: 0.9;
-		letter-spacing: -0.03em;
 	}
 
 	.head span {
 		color: var(--mute);
 	}
 
-	.grid {
-		columns: 3 280px;
-		column-gap: 16px;
+	.masonry {
+		columns: var(--cols);
+		column-gap: var(--gap);
 	}
 
-	figure {
+	.masonry figure {
 		break-inside: avoid;
-		margin-bottom: 22px;
+		margin-bottom: var(--gap);
+	}
+
+	.grid.grid {
+		display: grid;
+		grid-template-columns: repeat(var(--cols), 1fr);
+		gap: var(--gap);
+	}
+
+	.grid.grid :global(img) {
+		aspect-ratio: 4 / 5;
+		object-fit: cover;
+	}
+
+	.big {
+		display: flex;
+		flex-direction: column;
+		gap: calc(var(--gap) * 2);
+		max-width: 900px;
 	}
 
 	button {
@@ -77,6 +104,20 @@
 
 	button :global(img) {
 		width: 100%;
+	}
+
+	@media (max-width: 700px) {
+		.masonry {
+			columns: min(var(--cols), 2);
+		}
+
+		.grid.grid {
+			grid-template-columns: repeat(min(var(--cols), 2), 1fr);
+		}
+	}
+
+	figure {
+		margin: 0;
 	}
 
 	figcaption {

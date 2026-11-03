@@ -1,26 +1,41 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import '@fontsource-variable/archivo/wdth.css';
 	import favicon from '#lib/assets/favicon.svg';
+	import { onMount } from 'svelte';
 	import { page } from '$app/state';
 	import { site } from '#lib/data.ts';
+	import { custom, load } from '#lib/custom.svelte.ts';
+	import TryPanel from '#lib/TryPanel.svelte';
+	import { fontById } from '#lib/fonts.ts';
 	import type { LayoutProps } from './$types';
 
 	let { children }: LayoutProps = $props();
 
-		let theme = $state('light');
+	onMount(load);
 
-	onMount(() => {
-		theme = document.documentElement.dataset.theme ?? 'light';
+	$effect(() => {
+		const root = document.documentElement.style;
+		for (const k of ['paper', 'ink', 'mute', 'line'] as const) {
+			if (custom.on) root.setProperty(`--${k}`, custom[k]);
+			else root.removeProperty(`--${k}`);
+		}
 	});
 
-	function toggle() {
-		theme = theme === 'dark' ? 'light' : 'dark';
-		document.documentElement.dataset.theme = theme;
-		try {
-			localStorage.setItem('theme', theme);
-		} catch {}
-	}
+	$effect(() => {
+		const root = document.documentElement.style;
+		const f = fontById(custom.font);
+		if (custom.on && f.load) {
+			f.load();
+			root.setProperty('--display', f.family);
+			root.setProperty('--display-weight', String(f.weight));
+			root.setProperty('--display-stretch', f.stretch);
+			root.setProperty('--display-spacing', f.spacing);
+		} else {
+			for (const k of ['display', 'display-weight', 'display-stretch', 'display-spacing'])
+				root.removeProperty(`--${k}`);
+		}
+	});
+
 </script>
 
 <svelte:head>
@@ -28,16 +43,28 @@
 </svelte:head>
 
 <header>
-		<a class="home" href="/">{site.name}</a>
+	<a class="home" href="/">{site.name}</a>
 	<nav>
 		<a href="/gallery" class:on={page.url.pathname === '/gallery'}>work</a>
 		<a href="/commissions" class:on={page.url.pathname === '/commissions'}>commissions</a>
 		<a href="mailto:{site.email}">contact</a>
-		<button onclick={toggle}>{theme === 'dark' ? 'light' : 'dark'}</button>
 	</nav>
 </header>
 
+{#if custom.on && custom.bg}
+	<div
+		class="bgimg"
+		style:background-image={`url(${custom.bg})`}
+		style:opacity={custom.bgOpacity}
+		style:filter={`blur(${custom.bgBlur}px)`}
+	></div>
+{/if}
+
 {@render children()}
+
+{#if custom.panel}
+	<TryPanel />
+{/if}
 
 <footer>
 	<span>© {new Date().getFullYear()} {site.name.toLowerCase()}</span>
@@ -53,12 +80,6 @@
 		--pad: clamp(16px, 4vw, 48px);
 	}
 
-	:global(:root[data-theme='dark']) {
-		--paper: #121212;
-		--ink: #ecebe6;
-		--mute: #8f8b84;
-		--line: #2d2c2a;
-	}
 
 	:global(*) {
 		box-sizing: border-box;
@@ -86,6 +107,13 @@
 		display: block;
 	}
 
+	:global(h1) {
+		font-family: var(--display, inherit);
+		font-weight: var(--display-weight, 900);
+		font-stretch: var(--display-stretch, 125%);
+		letter-spacing: var(--display-spacing, -0.03em);
+	}
+
 	:global(html.js img) {
 		opacity: 0;
 		transition: opacity 0.5s ease;
@@ -102,6 +130,15 @@
 	:global(::selection) {
 		background: var(--ink);
 		color: var(--paper);
+	}
+
+	.bgimg {
+		position: fixed;
+		inset: -40px;
+		background-size: cover;
+		background-position: center;
+		z-index: -1;
+		pointer-events: none;
 	}
 
 	header {
@@ -124,22 +161,11 @@
 		margin-left: auto;
 	}
 
-	nav a,
-	nav button {
+	nav a {
 		text-decoration: none;
 	}
 
-	nav button {
-		background: none;
-		border: none;
-		padding: 0;
-		font: inherit;
-		color: inherit;
-		cursor: pointer;
-	}
-
 	nav a:hover,
-	nav button:hover,
 	nav a.on {
 		text-decoration: underline;
 		text-underline-offset: 4px;

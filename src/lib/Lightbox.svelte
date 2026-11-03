@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { GalleryItem } from './data.ts';
+	import Pic from './Pic.svelte';
 
 	let { items, index = $bindable() }: { items: GalleryItem[]; index: number | null } = $props();
 
@@ -25,7 +26,7 @@
 {#if index !== null}
 	<div class="overlay" onclick={close} role="presentation">
 		<button onclick={(e) => { e.stopPropagation(); step(-1); }}>‹</button>
-		<enhanced:img src={items[index].pic} alt={items[index].title} sizes="85vw" />
+		<Pic pic={items[index].pic} url={items[index].url} alt={items[index].title} sizes="85vw" loading="eager" />
 		<button onclick={(e) => { e.stopPropagation(); step(1); }}>›</button>
 		<p>{items[index].title}</p>
 	</div>

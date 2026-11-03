@@ -19,25 +19,25 @@ export const art: Record<string, Picture> = Object.fromEntries(
 	Object.entries(files).map(([path, pic]) => [path.split('/').pop()!, pic])
 );
 
-export const gallery = Object.keys(art)
+export type GalleryItem = { pic?: Picture; url?: string; title: string };
+
+export const gallery: GalleryItem[] = Object.keys(art)
 	.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
 	.map((file) => ({
 		pic: art[file],
 		title: file.replace(/\.\w+$/, '').replace(/[-_]/g, ' ')
 	}));
 
-export type GalleryItem = (typeof gallery)[number];
-
 export const site = {
 	name: 'viplusart',
 	tags: ['she/her', 'illustrator'],
 	avatar,
-	email: 'artist@example.com',
+	email: 'viplus017@gmail.com',
 	socials: [
-		{ name: 'Telegram', url: 'https://t.me/', icon: siTelegram },
+		{ name: 'Telegram', url: 'https://t.me/Viplus_Art', icon: siTelegram },
 		{ name: 'X', url: 'https://x.com/', icon: siX },
 		{ name: 'Instagram', url: 'https://instagram.com/', icon: siInstagram },
-		{ name: 'TikTok', url: 'https://tiktok.com/', icon: siTiktok },
+		{ name: 'TikTok', url: 'https://www.tiktok.com/@vi_plus', icon: siTiktok },
 		{ name: 'Pinterest', url: 'https://pinterest.com/', icon: siPinterest }
 	]
 };
@@ -46,22 +46,9 @@ export const commissions = {
 	open: true,
 	currency: '$',
 	tiers: [
-		{ name: 'bust', price: 20, desc: 'head and shoulders', img: '1.jpg' },
-		{ name: 'half body', price: 35, desc: 'waist up', img: '2.jpg' },
-		{ name: 'full body', price: 50, desc: 'whole character', img: '3.jpg' }
+		{ name: 'tier one', price: '??', img: '1.jpg' },
+		{ name: 'tier two', price: '??', img: '2.jpg' },
+		{ name: 'tier three', price: '??', img: '3.jpg' }
 	],
-	extras: [
-		{ name: 'simple background', price: 10 },
-		{ name: 'extra character', price: '+80%' }
-	],
-	will: ['original characters', 'fanart', 'couples'],
-	wont: ['nsfw', 'mecha', 'heavy gore'],
-	terms: [
-		'payment upfront before i start',
-		'you get a sketch to approve before the final',
-		'up to 2 small revisions included',
-		'usually done in 1–2 weeks',
-		'no refunds once the sketch is done'
-	],
-	howTo: 'email me with your character refs, the tier you want and any details'
+	note: 'to order, message me with your idea and references'
 };

@@ -1,5 +1,11 @@
 <script lang="ts">
 	import { site, art, commissions as c } from '#lib/data.ts';
+	import { custom, defaults } from '#lib/custom.svelte.ts';
+	import Pic from '#lib/Pic.svelte';
+
+	let layout = $derived(custom.on ? custom.commLayout : defaults.commLayout);
+	let shape = $derived(custom.on ? custom.commShape : defaults.commShape);
+	let telegram = site.socials.find((s) => s.name === 'Telegram');
 </script>
 
 <svelte:head>
@@ -12,51 +18,40 @@
 		<span class:closed={!c.open}>{c.open ? 'open' : 'closed'}</span>
 	</div>
 
-	<div class="tiers">
-		{#each c.tiers as t}
-			<div class="tier">
-				{#if art[t.img]}
-					<enhanced:img src={art[t.img]} alt={t.name} sizes="(max-width: 700px) 100vw, 33vw" loading="lazy" />
-				{/if}
-				<div class="row">
-					<h2>{t.name}</h2>
-					<span>{c.currency}{t.price}</span>
-				</div>
-				<p>{t.desc}</p>
-			</div>
-		{/each}
-	</div>
-
-	<dl>
-		<dt>extras</dt>
-		<dd>
-			{#each c.extras as e}
-				<div class="row">
-					<span>{e.name}</span>
-					<span>{typeof e.price === 'number' ? `+${c.currency}${e.price}` : e.price}</span>
+	{#if layout === 'pictures'}
+		<div class="tiers">
+			{#each c.tiers as t, i}
+				<div class="tier {shape}">
+					<Pic
+						pic={art[t.img]}
+						url={custom.on ? custom.tierPics[i] : null}
+						alt={t.name}
+						sizes="(max-width: 700px) 100vw, 33vw"
+					/>
+					<div class="row">
+						<h2>{t.name}</h2>
+						<span>{c.currency}{t.price}</span>
+					</div>
 				</div>
 			{/each}
-		</dd>
+		</div>
+	{:else}
+		<ul class="list">
+			{#each c.tiers as t}
+				<li>
+					<span>{t.name}</span>
+					<i></i>
+					<span>{c.currency}{t.price}</span>
+				</li>
+			{/each}
+		</ul>
+	{/if}
 
-		<dt>will draw</dt>
-		<dd>{c.will.join(', ')}</dd>
-
-		<dt>won't draw</dt>
-		<dd>{c.wont.join(', ')}</dd>
-
-		<dt>terms</dt>
-		<dd>
-			<ol>
-				{#each c.terms as t}<li>{t}</li>{/each}
-			</ol>
-		</dd>
-
-		<dt>how to order</dt>
-		<dd>
-			<p>{c.howTo}</p>
-			<a class="mail" href="mailto:{site.email}">{site.email}</a>
-		</dd>
-	</dl>
+	<p class="order">
+		{c.note}:
+		{#if telegram}<a href={telegram.url} target="_blank" rel="noreferrer">telegram</a> or{/if}
+		<a href="mailto:{site.email}">{site.email}</a>
+	</p>
 </main>
 
 <style>
@@ -74,10 +69,7 @@
 
 	h1 {
 		font-size: clamp(40px, 9vw, 120px);
-		font-weight: 900;
-		font-stretch: 125%;
 		line-height: 0.9;
-		letter-spacing: -0.03em;
 	}
 
 	.head span {
@@ -97,12 +89,20 @@
 		gap: 16px;
 		border-top: 1px solid var(--ink);
 		padding-top: 16px;
+		align-items: start;
 	}
 
 	.tier :global(img) {
 		width: 100%;
-		aspect-ratio: 4 / 5;
 		object-fit: cover;
+	}
+
+	.tier.portrait :global(img) {
+		aspect-ratio: 4 / 5;
+	}
+
+	.tier.square :global(img) {
+		aspect-ratio: 1;
 	}
 
 	.row {
@@ -110,73 +110,49 @@
 		justify-content: space-between;
 		align-items: baseline;
 		gap: 12px;
-	}
-
-	.tier .row {
 		margin-top: 10px;
 	}
 
-	h2 {
-		font-size: 22px;
-		font-weight: 800;
-		font-stretch: 110%;
-	}
-
-	.tier .row span {
+	h2,
+	.row span {
 		font-size: 22px;
 		font-weight: 800;
 	}
 
-	.tier p {
-		color: var(--mute);
-	}
-
-	dl {
-		display: grid;
-		grid-template-columns: 180px 1fr;
-		margin-top: 64px;
+	.list {
+		list-style: none;
+		padding: 0;
 		border-top: 1px solid var(--ink);
-	}
-
-	dt,
-	dd {
-		padding: 14px 0;
-		border-bottom: 1px solid var(--line);
-	}
-
-	dt {
-		font-weight: 700;
-	}
-
-	dd {
-		font-size: 17px;
 		max-width: 640px;
 	}
 
-	dd .row + .row {
-		margin-top: 4px;
+	.list li {
+		display: flex;
+		align-items: baseline;
+		gap: 12px;
+		padding: 14px 0;
+		border-bottom: 1px solid var(--line);
+		font-size: 22px;
+		font-weight: 700;
 	}
 
-	ol {
-		padding-left: 20px;
+	.list i {
+		flex: 1;
+		border-bottom: 1px dotted var(--mute);
 	}
 
-	.mail {
-		display: inline-block;
-		margin-top: 8px;
+	.order {
+		margin-top: 40px;
+		font-size: 17px;
+	}
+
+	.order a {
 		font-weight: 700;
 	}
 
 	@media (max-width: 700px) {
 		.tiers {
 			grid-template-columns: 1fr;
-		}
-		dl {
-			grid-template-columns: 1fr;
-		}
-		dt {
-			border-bottom: none;
-			padding-bottom: 0;
 		}
 	}
 </style>
