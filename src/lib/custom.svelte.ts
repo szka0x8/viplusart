@@ -1,4 +1,5 @@
 import { site, commissions } from './data.ts';
+import { resolve } from '$app/paths';
 
 export const defaults = {
 	paper: '#eeebe4',
@@ -119,7 +120,7 @@ export function shareLink() {
 			.filter((k) => JSON.stringify(d[k]) !== JSON.stringify(defaults[k]))
 			.map((k) => [k, d[k]])
 	);
-	return `${location.origin}/try#${encodeURIComponent(JSON.stringify(diff))}`;
+	return `${location.origin}${resolve('/try')}#${encodeURIComponent(JSON.stringify(diff))}`;
 }
 
 export function applyShare(hash: string) {

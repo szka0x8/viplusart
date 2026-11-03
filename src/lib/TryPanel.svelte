@@ -13,6 +13,7 @@
 	} from './custom.svelte.ts';
 	import { fonts, fontById, bodyFonts, bodyFontById } from './fonts.ts';
 	import { site, commissions } from './data.ts';
+	import { resolve } from '$app/paths';
 
 	onMount(() => {
 		for (const f of [...fonts, ...bodyFonts]) f.load?.();
@@ -447,12 +448,12 @@
 				{/if}
 				<p class="note">{l.picsNote}</p>
 			{:else if custom.tab === 'pages'}
-				<span class="label">{l.home} <a class="link" href="/">→</a></span>
+				<span class="label">{l.home} <a class="link" href={resolve('/')}>→</a></span>
 				{@render toggle(l.showTags, custom.showTags, (v) => setc('showTags', v))}
 				{@render toggle(l.showStatus, custom.showStatus, (v) => setc('showStatus', v))}
 				{@render toggle(l.showRecent, custom.showRecent, (v) => setc('showRecent', v))}
 
-				<span class="label">{l.work} <a class="link" href="/gallery">→</a></span>
+				<span class="label">{l.work} <a class="link" href={resolve('/gallery')}>→</a></span>
 				{@render seg(['masonry', 'grid', 'big'] as const, custom.workLayout, (v) => setc('workLayout', v), (v) => l[v])}
 				{#if custom.workLayout !== 'big'}
 					{@render seg([2, 3, 4] as const, custom.workCols, (v) => setc('workCols', v), (v) => `${v} ${l.cols}`)}
@@ -460,7 +461,7 @@
 				{@render seg(['tight', 'normal', 'wide'] as const, custom.workGap, (v) => setc('workGap', v), (v) => l[v])}
 				{@render toggle(l.titles, custom.workTitles, (v) => setc('workTitles', v))}
 
-				<span class="label">{l.comm} <a class="link" href="/commissions">→</a></span>
+				<span class="label">{l.comm} <a class="link" href={resolve('/commissions')}>→</a></span>
 				{@render seg(['pictures', 'list'] as const, custom.commLayout, (v) => setc('commLayout', v), (v) => l[v])}
 				{#if custom.commLayout === 'pictures'}
 					{@render seg(

@@ -3,6 +3,7 @@
 	import favicon from '#lib/assets/favicon.svg';
 	import { onMount } from 'svelte';
 	import { page } from '$app/state';
+	import { resolve } from '$app/paths';
 	import { site } from '#lib/data.ts';
 	import { custom, load, view } from '#lib/custom.svelte.ts';
 	import TryPanel from '#lib/TryPanel.svelte';
@@ -55,10 +56,10 @@
 </svelte:head>
 
 <header>
-	<a class="home" href="/">{view.name}</a>
+	<a class="home" href={resolve('/')}>{view.name}</a>
 	<nav>
-		<a href="/gallery" class:on={page.url.pathname === '/gallery'}>work</a>
-		<a href="/commissions" class:on={page.url.pathname === '/commissions'}>commissions</a>
+		<a href={resolve('/gallery')} class:on={page.route.id === '/gallery'}>work</a>
+		<a href={resolve('/commissions')} class:on={page.route.id === '/commissions'}>commissions</a>
 		<a href="mailto:{site.email}">contact</a>
 	</nav>
 </header>

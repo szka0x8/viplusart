@@ -2,6 +2,7 @@
 	import { site, gallery, commissions } from '#lib/data.ts';
 	import { custom, view } from '#lib/custom.svelte.ts';
 	import Pic from '#lib/Pic.svelte';
+	import { resolve } from '$app/paths';
 
 	let items = $derived(custom.on && custom.workPics.length ? custom.workPics : gallery);
 </script>
@@ -33,7 +34,7 @@
 			{#if view.o.showStatus}
 				<p class="status">
 					commissions are <b>{commissions.open ? 'open' : 'closed'}</b>
-					<a href="/commissions">see prices</a>
+					<a href={resolve('/commissions')}>see prices</a>
 				</p>
 			{/if}
 
@@ -56,11 +57,11 @@
 		<section class="recent">
 			<div class="head">
 				<h2>recent work</h2>
-				<a href="/gallery">all work →</a>
+				<a href={resolve('/gallery')}>all work →</a>
 			</div>
 			<div class="strip">
 				{#each items.slice(-4).reverse() as item}
-					<a href="/gallery" aria-label={item.title}>
+					<a href={resolve('/gallery')} aria-label={item.title}>
 						<Pic {...item} alt={item.title} sizes="(max-width: 700px) 50vw, 25vw" />
 					</a>
 				{/each}

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { custom, save, applyShare } from '#lib/custom.svelte.ts';
 
 	onMount(() => {
@@ -8,7 +9,7 @@
 		custom.panel = true;
 		custom.open = true;
 		save();
-		goto('/', { replaceState: true });
+		goto(resolve('/'), { replaceState: true });
 	});
 </script>
 
