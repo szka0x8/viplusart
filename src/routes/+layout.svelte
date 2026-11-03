@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import '@fontsource-variable/archivo/wdth.css';
 	import favicon from '#lib/assets/favicon.svg';
 	import { page } from '$app/state';
@@ -6,6 +7,20 @@
 	import type { LayoutProps } from './$types';
 
 	let { children }: LayoutProps = $props();
+
+		let theme = $state('light');
+
+	onMount(() => {
+		theme = document.documentElement.dataset.theme ?? 'light';
+	});
+
+	function toggle() {
+		theme = theme === 'dark' ? 'light' : 'dark';
+		document.documentElement.dataset.theme = theme;
+		try {
+			localStorage.setItem('theme', theme);
+		} catch {}
+	}
 </script>
 
 <svelte:head>
@@ -13,11 +28,14 @@
 </svelte:head>
 
 <header>
-	<a class="home" href="/">{site.name}</a>
+	{#if page.url.pathname !== '/'}
+		<a class="home" href="/">{site.name}</a>
+	{/if}
 	<nav>
 		<a href="/gallery" class:on={page.url.pathname === '/gallery'}>work</a>
 		<a href="/commissions" class:on={page.url.pathname === '/commissions'}>commissions</a>
 		<a href="mailto:{site.email}">contact</a>
+		<button onclick={toggle}>{theme === 'dark' ? 'light' : 'dark'}</button>
 	</nav>
 </header>
 
@@ -35,6 +53,13 @@
 		--mute: #77736b;
 		--line: #d3cec4;
 		--pad: clamp(16px, 4vw, 48px);
+	}
+
+	:global(:root[data-theme='dark']) {
+		--paper: #121212;
+		--ink: #ecebe6;
+		--mute: #8f8b84;
+		--line: #2d2c2a;
 	}
 
 	:global(*) {
@@ -85,13 +110,25 @@
 	nav {
 		display: flex;
 		gap: 22px;
+		margin-left: auto;
 	}
 
-	nav a {
+	nav a,
+	nav button {
 		text-decoration: none;
 	}
 
+	nav button {
+		background: none;
+		border: none;
+		padding: 0;
+		font: inherit;
+		color: inherit;
+		cursor: pointer;
+	}
+
 	nav a:hover,
+	nav button:hover,
 	nav a.on {
 		text-decoration: underline;
 		text-underline-offset: 4px;

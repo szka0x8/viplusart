@@ -58,7 +58,7 @@
 	}
 
 	h1 {
-		font-size: clamp(64px, 17vw, 260px);
+		font-size: clamp(44px, 8vw, 120px);
 		font-weight: 900;
 		font-stretch: 125%;
 		line-height: 0.85;
