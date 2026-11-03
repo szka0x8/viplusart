@@ -12,6 +12,7 @@
 		shareLink
 	} from './custom.svelte.ts';
 	import { fonts, fontById, bodyFonts, bodyFontById } from './fonts.ts';
+	import ColorPick from './ColorPick.svelte';
 	import { site, commissions } from './data.ts';
 	import { resolve } from '$app/paths';
 
@@ -336,13 +337,13 @@
 
 				<span class="label">{l.colors}</span>
 				{#each colors as c}
-					<label class="row">
+					<div class="row">
 						<span>{l[colorNames[c]]}</span>
 						<span class="pick">
 							<input type="text" bind:value={custom[c]} oninput={changed} spellcheck="false" />
-							<input type="color" bind:value={custom[c]} oninput={changed} />
+							<ColorPick bind:value={custom[c]} onchange={changed} />
 						</span>
-					</label>
+					</div>
 				{/each}
 
 				<span class="label">{l.font}</span>
@@ -718,16 +719,7 @@
 		text-align: right;
 	}
 
-	input[type='color'] {
-		width: 22px;
-		height: 22px;
-		padding: 0;
-		border: 1px solid #ccc;
-		background: none;
-		cursor: pointer;
-	}
-
-	input[type='range'] {
+	.row > input[type='range'] {
 		width: 140px;
 		accent-color: #111;
 	}
