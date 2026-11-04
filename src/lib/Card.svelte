@@ -30,7 +30,6 @@
 		width: min(760px, 100%);
 		padding: clamp(22px, 4vw, 40px);
 		background: color-mix(in srgb, var(--paper) var(--card-alpha, 82%), transparent);
-		backdrop-filter: blur(12px);
 		border: 1px solid var(--line);
 		border-radius: var(--radius);
 		box-shadow: 0 24px 60px rgb(0 0 0 / 0.12);
@@ -94,5 +93,11 @@
 		height: 5px;
 		border-radius: 50%;
 		background: var(--mute);
+	}
+
+	@media (hover: hover) and (pointer: fine) {
+		.card {
+			backdrop-filter: blur(12px);
+		}
 	}
 </style>

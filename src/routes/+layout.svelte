@@ -14,7 +14,22 @@
 
 	let bare = $derived(view.o.layout === 'card' && page.route.id !== '/try');
 
-	onMount(load);
+	let grainUrl = $state('');
+
+	onMount(() => {
+		load();
+		const c = document.createElement('canvas');
+		c.width = c.height = 160;
+		const ctx = c.getContext('2d')!;
+		const img = ctx.createImageData(160, 160);
+		for (let i = 0; i < img.data.length; i += 4) {
+			const v = Math.random() * 255;
+			img.data[i] = img.data[i + 1] = img.data[i + 2] = v;
+			img.data[i + 3] = 90;
+		}
+		ctx.putImageData(img, 0, 0);
+		grainUrl = c.toDataURL();
+	});
 
 	$effect(() => {
 		const root = document.documentElement.style;
@@ -105,7 +120,7 @@
 {@render children()}
 
 {#if custom.on && custom.grain > 0}
-	<div class="grain" style:opacity={custom.grain}></div>
+	<div class="grain" style:opacity={custom.grain} style:background-image={grainUrl ? `url(${grainUrl})` : 'none'}></div>
 {/if}
 
 {#if custom.panel}
@@ -222,8 +237,8 @@
 		inset: 0;
 		z-index: 15;
 		pointer-events: none;
-		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-		mix-blend-mode: multiply;
+		will-change: transform;
+		transform: translateZ(0);
 	}
 
 	:global(html.card body) {
@@ -235,6 +250,8 @@
 		inset: 0;
 		z-index: -1;
 		pointer-events: none;
+		will-change: transform;
+		transform: translateZ(0);
 	}
 
 	.bgimg {
@@ -244,6 +261,8 @@
 		background-position: center;
 		z-index: -1;
 		pointer-events: none;
+		will-change: transform;
+		transform: translateZ(0);
 	}
 
 	header {

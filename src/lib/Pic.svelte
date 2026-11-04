@@ -72,9 +72,9 @@
 
 <span class="pic" onpointerdown={down} role="presentation">
 	{#if url}
-		<img src={url} {alt} {loading} style={pos} draggable="false" />
+		<img src={url} {alt} {loading} style={pos} draggable="false" decoding="async" />
 	{:else if pic}
-		<enhanced:img src={pic} {alt} {sizes} {loading} {fetchpriority} style={pos} draggable="false" />
+		<enhanced:img src={pic} {alt} {sizes} {loading} {fetchpriority} style={pos} draggable="false" decoding="async" />
 	{/if}
 </span>
 
