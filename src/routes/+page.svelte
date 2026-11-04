@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { site, gallery, commissions } from '#lib/data.ts';
-	import { custom, view } from '#lib/custom.svelte.ts';
+	import { custom, view, workItems } from '#lib/custom.svelte.ts';
 	import Pic from '#lib/Pic.svelte';
 	import { resolve } from '$app/paths';
 	import HomeCard from '#lib/HomeCard.svelte';
 
-	let items = $derived(custom.on && custom.workPics.length ? custom.workPics : gallery);
+	let items = $derived(workItems());
 </script>
 
 <svelte:head>
@@ -18,11 +18,12 @@
 <main>
 	<h1>{view.name}</h1>
 
-	<section class="intro">
+	<section class="intro" class:flip={view.o.avatarSide === 'right'}>
 		<div class="avatar {view.o.avatarShape}">
 			<Pic
 				pic={site.avatar}
 				url={custom.on ? custom.avatarUrl : null}
+				focus="avatar"
 				alt={view.name}
 				sizes="(max-width: 700px) 100vw, 380px"
 				loading="eager"
@@ -66,7 +67,7 @@
 			<div class="strip">
 				{#each items.slice(-4).reverse() as item}
 					<a href={resolve('/gallery')} aria-label={item.title}>
-						<Pic {...item} alt={item.title} sizes="(max-width: 700px) 50vw, 25vw" />
+						<Pic {...item} alt={item.title} sizes="(max-width: 700px) 50vw, 25vw" focus="g:{item.title}" />
 					</a>
 				{/each}
 			</div>
@@ -83,6 +84,7 @@
 	h1 {
 		font-size: calc(clamp(44px, 8vw, 120px) * var(--title-scale, 1));
 		line-height: 0.85;
+		text-align: var(--a-title, left);
 		margin: 28px 0 32px;
 		word-break: break-word;
 	}
@@ -92,6 +94,14 @@
 		grid-template-columns: minmax(0, 380px) minmax(0, 1fr);
 		gap: clamp(24px, 4vw, 64px);
 		align-items: start;
+	}
+
+	.intro.flip {
+		grid-template-columns: minmax(0, 1fr) minmax(0, 380px);
+	}
+
+	.intro.flip > :first-child {
+		order: 2;
 	}
 
 	.avatar :global(img) {

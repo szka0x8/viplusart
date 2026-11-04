@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { site, gallery } from '#lib/data.ts';
 	import Lightbox from '#lib/Lightbox.svelte';
-	import { custom, defaults, view } from '#lib/custom.svelte.ts';
+	import { custom, defaults, view, workItems, swapWork, editing } from '#lib/custom.svelte.ts';
+	import { swappable } from '#lib/swap.ts';
 	import Pic from '#lib/Pic.svelte';
 	import GalleryCard from '#lib/GalleryCard.svelte';
 
 	let o = $derived(custom.on ? custom : defaults);
-	let items = $derived(custom.on && custom.workPics.length ? custom.workPics : gallery);
+	let items = $derived(workItems());
 	const gaps = { tight: '4px', normal: '16px', wide: '36px' };
 
 	let open: number | null = $state(null);
@@ -31,9 +32,9 @@
 		style:--gap={gaps[o.workGap]}
 	>
 		{#each items as item, i}
-			<figure>
+			<figure use:swappable={{ i, enabled: editing.swap, onswap: swapWork }}>
 				<button onclick={() => (open = i)} aria-label={item.title}>
-					<Pic {...item} alt={item.title} sizes="(max-width: 700px) 100vw, 33vw" />
+					<Pic {...item} alt={item.title} sizes="(max-width: 700px) 100vw, 33vw" focus="g:{item.title}" />
 				</button>
 				{#if o.workTitles}
 					<figcaption>

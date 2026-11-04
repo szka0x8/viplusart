@@ -5,7 +5,7 @@
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
 	import { site } from '#lib/data.ts';
-	import { custom, load, view } from '#lib/custom.svelte.ts';
+	import { custom, load, view, editing } from '#lib/custom.svelte.ts';
 	import TryPanel from '#lib/TryPanel.svelte';
 	import { fontById, bodyFontById } from '#lib/fonts.ts';
 	import type { LayoutProps } from './$types';
@@ -50,8 +50,25 @@
 		else html.style.removeProperty('--title-scale');
 		html.classList.toggle('bw', custom.on && custom.bw);
 		html.classList.toggle('card', view.o.layout === 'card');
+		html.classList.toggle('edit-swap', editing.swap);
+		html.classList.toggle('edit-crop', editing.crop);
 		if (custom.on) html.style.setProperty('--radius', `${custom.radius}px`);
 		else html.style.removeProperty('--radius');
+
+		const flex = { left: 'flex-start', center: 'center', right: 'flex-end' } as const;
+		const mi = { left: ['0', 'auto'], center: ['auto', 'auto'], right: ['auto', '0'] } as const;
+		for (const part of ['title', 'info', 'buttons', 'terms', 'lists', 'socials'] as const) {
+			const own = custom.alignParts?.[part] ?? 'auto';
+			const a = own !== 'auto' ? own : custom.align;
+			if (custom.on && a !== 'auto') {
+				html.style.setProperty(`--a-${part}`, a);
+				html.style.setProperty(`--af-${part}`, flex[a]);
+				html.style.setProperty(`--ml-${part}`, mi[a][0]);
+				html.style.setProperty(`--mr-${part}`, mi[a][1]);
+			} else for (const k of ['a', 'af', 'ml', 'mr']) html.style.removeProperty(`--${k}-${part}`);
+		}
+		if (custom.on) html.style.setProperty('--card-pos', flex[custom.cardPos]);
+		else html.style.removeProperty('--card-pos');
 	});
 
 </script>
@@ -158,6 +175,32 @@
 	:global(::selection) {
 		background: var(--ink);
 		color: var(--paper);
+	}
+
+	:global(html.edit-swap [data-swap]) {
+		cursor: grab;
+		user-select: none;
+		-webkit-touch-callout: none;
+	}
+
+	:global(html.edit-crop main img) {
+		cursor: move;
+		touch-action: none;
+		user-select: none;
+		-webkit-user-drag: none;
+		-webkit-touch-callout: none;
+	}
+
+	:global(.swap-drag) {
+		position: relative;
+		z-index: 30;
+		opacity: 0.85;
+		cursor: grabbing !important;
+	}
+
+	:global(.swap-target) {
+		outline: 2px dashed var(--ink);
+		outline-offset: 4px;
 	}
 
 	:global(html.card main img) {

@@ -52,13 +52,8 @@ export const commissions = {
 		{ section: 'sketches', name: 'sketch two', price: '??', img: '1.jpg' }
 	],
 	payment: 'payment details in dms',
-	terms: [
-		'full payment upfront',
-		'no refunds once i start',
-		'you get a sketch to approve first',
-		'commercial use costs extra'
-	],
-	will: ['original characters', 'fanart', 'couples'],
-	wont: ['mecha', 'nsfw'],
+	terms: ['term one', 'term two', 'term three', 'term four'],
+	will: ['thing one', 'thing two', 'thing three'],
+	wont: ['thing one', 'thing two'],
 	note: 'to order, message me with your idea and references'
 };

@@ -21,7 +21,7 @@
 	main {
 		min-height: 100dvh;
 		display: flex;
-		justify-content: center;
+		justify-content: var(--card-pos, center);
 		align-items: flex-start;
 		padding: clamp(24px, 6vh, 64px) var(--pad);
 	}

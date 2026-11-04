@@ -18,14 +18,14 @@
 
 	<hr class="sep" />
 
-	<p class="center">by commissioning me, you agree to these terms:</p>
+	<p class="t-terms">by commissioning me, you agree to these terms:</p>
 	<ul class="dots terms">
 		{#each view.terms as t}
 			<li>{t}</li>
 		{/each}
 	</ul>
 
-	<p class="center payment">{view.payment}</p>
+	<p class="t-terms payment">{view.payment}</p>
 
 	<hr class="sep" />
 
@@ -54,6 +54,7 @@
 						<Pic
 							pic={art[t.img]}
 							url={custom.on ? custom.tierPics[t.i] : null}
+							focus="t:{t.i}"
 							alt={t.name}
 							sizes="(max-width: 700px) 90vw, 340px"
 						/>
@@ -69,7 +70,7 @@
 
 	<hr class="sep" />
 
-	<p class="center">
+	<p class="t-info">
 		{view.note}:<br />
 		{#if telegram}<a href={telegram.url} target="_blank" rel="noreferrer">telegram</a> or{/if}
 		<a href="mailto:{site.email}">{site.email}</a>
@@ -78,24 +79,28 @@
 
 <style>
 	.status {
-		text-align: center;
+		text-align: var(--a-info, center);
 		font-size: 18px;
 		margin-bottom: 14px;
 	}
 
 	.jump {
 		display: flex;
-		justify-content: center;
+		justify-content: var(--af-buttons, center);
 		flex-wrap: wrap;
 		gap: 10px;
 	}
 
-	.center {
-		text-align: center;
+	.t-terms {
+		text-align: var(--a-terms, center);
+	}
+
+	.t-info {
+		text-align: var(--a-info, center);
 	}
 
 	.terms {
-		margin: 14px auto 0;
+		margin: 14px var(--mr-terms, auto) 0 var(--ml-terms, auto);
 		max-width: 460px;
 	}
 
@@ -109,7 +114,7 @@
 		grid-template-columns: 1fr 1fr;
 		gap: 24px;
 		max-width: 520px;
-		margin: 0 auto;
+		margin: 0 var(--mr-lists, auto) 0 var(--ml-lists, auto);
 	}
 
 	h3 {
@@ -123,7 +128,7 @@
 	}
 
 	h2 {
-		text-align: center;
+		text-align: var(--a-title, center);
 		font-size: 22px;
 		font-weight: 700;
 		margin-bottom: 16px;

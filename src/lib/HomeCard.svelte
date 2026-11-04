@@ -9,11 +9,12 @@
 	<div class="card">
 		<h1>{view.name}</h1>
 
-		<div class="body">
+		<div class="body" class:flip={view.o.avatarSide === 'right'}>
 			<div class="avatar {view.o.avatarShape}">
 				<Pic
 					pic={site.avatar}
 					url={custom.on ? custom.avatarUrl : null}
+				focus="avatar"
 					alt={view.name}
 					sizes="(max-width: 700px) 90vw, 340px"
 					loading="eager"
@@ -58,7 +59,8 @@
 	main {
 		min-height: 100dvh;
 		display: grid;
-		place-items: center;
+		align-items: center;
+		justify-items: var(--card-pos, center);
 		padding: 32px var(--pad);
 	}
 
@@ -73,7 +75,7 @@
 	}
 
 	h1 {
-		text-align: center;
+		text-align: var(--a-title, center);
 		font-size: calc(clamp(36px, 6vw, 72px) * var(--title-scale, 1));
 		line-height: 1;
 		margin-bottom: 28px;
@@ -85,6 +87,10 @@
 		grid-template-columns: 1fr 1fr;
 		gap: clamp(20px, 3vw, 36px);
 		align-items: center;
+	}
+
+	.body.flip .avatar {
+		order: 2;
 	}
 
 	.avatar :global(img) {
@@ -113,13 +119,13 @@
 		list-style: none;
 		padding: 0;
 		font-size: 18px;
-		text-align: center;
+		text-align: var(--a-info, center);
 		color: var(--ink);
 	}
 
 	.btn {
 		display: block;
-		text-align: center;
+		text-align: var(--a-buttons, center);
 		padding: 10px 16px;
 		border-radius: 999px;
 		background: color-mix(in srgb, var(--ink) 10%, transparent);
@@ -133,14 +139,14 @@
 	}
 
 	.status {
-		text-align: center;
+		text-align: var(--a-info, center);
 		color: var(--mute);
 	}
 
 	.mail {
 		display: flex;
 		flex-direction: column;
-		align-items: center;
+		align-items: var(--af-info, center);
 		gap: 2px;
 		margin-top: 4px;
 	}
@@ -154,7 +160,7 @@
 
 	.socials {
 		display: flex;
-		justify-content: center;
+		justify-content: var(--af-socials, center);
 		flex-wrap: wrap;
 		gap: 22px;
 		margin-top: 28px;

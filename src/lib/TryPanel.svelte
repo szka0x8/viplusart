@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import {
+		defaults,
 		custom,
 		save,
 		reset,
@@ -67,6 +68,25 @@
 			clear: 'убрать',
 			picsNote: 'картинки только для просмотра и пропадут после перезагрузки. отправь мне их файлами',
 			home: 'главная',
+			alignment: 'выравнивание',
+			textAlign: 'текст',
+			cardPos: 'карточка на странице',
+			avatarSide: 'аватар',
+			auto: 'авто',
+			left: 'слева',
+			center: 'центр',
+			right: 'справа',
+			hero: 'первая крупно',
+			each: 'по отдельности',
+			parts: { title: 'названия', info: 'текст', buttons: 'кнопки', terms: 'условия', lists: 'рисую / не рисую', socials: 'иконки' },
+			short: { auto: 'А', left: 'Л', center: 'Ц', right: 'П' },
+			drag: 'перетаскивание',
+			dragOrder: 'порядок',
+			dragCrop: 'кадр',
+			dragOrderNote: 'зажми картинку на странице работ и перетащи на другую, они поменяются местами',
+			dragCropNote: 'тяни внутри картинки, чтобы выбрать, какая часть видна',
+			resetOrder: 'сбросить порядок',
+			resetCrop: 'сбросить кадры',
 			showTags: 'о тебе',
 			showStatus: 'статус комиссий',
 			showRecent: 'последние работы',
@@ -143,6 +163,25 @@
 			clear: 'clear',
 			picsNote: 'pictures are preview only and gone after reload. send them to me as files',
 			home: 'home',
+			alignment: 'alignment',
+			textAlign: 'text',
+			cardPos: 'card on the page',
+			avatarSide: 'avatar',
+			auto: 'auto',
+			left: 'left',
+			center: 'center',
+			right: 'right',
+			hero: 'first one big',
+			each: 'individually',
+			parts: { title: 'titles', info: 'text', buttons: 'buttons', terms: 'terms', lists: 'i do / i don\'t', socials: 'icons' },
+			short: { auto: 'A', left: 'L', center: 'C', right: 'R' },
+			drag: 'dragging',
+			dragOrder: 'order',
+			dragCrop: 'crop',
+			dragOrderNote: 'hold a picture on the work page and drag it onto another one to swap them',
+			dragCropNote: 'drag inside a picture to choose which part is visible',
+			resetOrder: 'reset order',
+			resetCrop: 'reset crops',
 			showTags: 'about you',
 			showStatus: 'commission status',
 			showRecent: 'recent work',
@@ -458,6 +497,14 @@
 					<input type="text" bind:value={custom.text.wont} oninput={changed} placeholder={commissions.wont.join(', ')} />
 				</label>
 			{:else if custom.tab === 'pics'}
+				<span class="label">{l.drag}</span>
+				{@render seg(['order', 'crop'] as const, custom.dragMode, (v) => set('dragMode', v), (v) => l[v === 'order' ? 'dragOrder' : 'dragCrop'])}
+				<p class="note">{custom.dragMode === 'order' ? l.dragOrderNote : l.dragCropNote}</p>
+				<div class="share">
+					<button class="link" onclick={() => setc('order', [])}>{l.resetOrder}</button>
+					<button class="link" onclick={() => setc('focus', {})}>{l.resetCrop}</button>
+				</div>
+
 				{@render file(l.avatar, custom.avatarUrl ? '✓' : '', pickAvatar, custom.avatarUrl ? () => (custom.avatarUrl = null) : null)}
 				<span class="label">{l.shape}</span>
 				{@render seg(['square', 'round', 'arch'] as const, custom.avatarShape, (v) => setc('avatarShape', v), (v) => l[v])}
@@ -493,18 +540,58 @@
 				{/if}
 				<p class="note">{l.picsNote}</p>
 			{:else if custom.tab === 'pages'}
+				<span class="label">{l.alignment}</span>
+				<span class="sub">{l.textAlign}</span>
+				{@render seg(['auto', 'left', 'center', 'right'] as const, custom.align, (v) => setc('align', v), (v) => l[v])}
+				{#if custom.layout === 'card'}
+					<span class="sub">{l.cardPos}</span>
+					{@render seg(['left', 'center', 'right'] as const, custom.cardPos, (v) => setc('cardPos', v), (v) => l[v])}
+				{/if}
+				<details class="each">
+					<summary>{l.each}</summary>
+					{#each ['title', 'info', 'buttons', 'terms', 'lists', 'socials'] as const as part}
+						<div class="row">
+							<span>{l.parts[part]}</span>
+							<span class="mini">
+								{#each ['auto', 'left', 'center', 'right'] as const as v}
+									<button
+										class:on={(custom.alignParts?.[part] ?? 'auto') === v}
+										title={l[v]}
+										onclick={() => {
+											custom.alignParts = { ...defaults.alignParts, ...custom.alignParts, [part]: v };
+											changed();
+										}}>{l.short[v]}</button
+									>
+								{/each}
+							</span>
+						</div>
+					{/each}
+				</details>
+				<span class="sub">{l.avatarSide}</span>
+				{@render seg(['left', 'right'] as const, custom.avatarSide, (v) => setc('avatarSide', v), (v) => l[v])}
+
 				<span class="label">{l.home} <a class="link" href={resolve('/')}>→</a></span>
 				{@render toggle(l.showTags, custom.showTags, (v) => setc('showTags', v))}
 				{@render toggle(l.showStatus, custom.showStatus, (v) => setc('showStatus', v))}
 				{@render toggle(l.showRecent, custom.showRecent, (v) => setc('showRecent', v))}
 
 				<span class="label">{l.work} <a class="link" href={resolve('/gallery')}>→</a></span>
-				{@render seg(['masonry', 'grid', 'big'] as const, custom.workLayout, (v) => setc('workLayout', v), (v) => l[v])}
-				{#if custom.workLayout !== 'big'}
-					{@render seg([2, 3, 4] as const, custom.workCols, (v) => setc('workCols', v), (v) => `${v} ${l.cols}`)}
+				{#if custom.layout === 'card'}
+					{@render seg(['grid', 'masonry', 'big'] as const, custom.cardGalLayout, (v) => setc('cardGalLayout', v), (v) => l[v])}
+					{#if custom.cardGalLayout !== 'big'}
+						{@render seg([2, 3, 4] as const, custom.cardGalCols, (v) => setc('cardGalCols', v), (v) => `${v} ${l.cols}`)}
+					{/if}
+					{@render seg(['tight', 'normal', 'wide'] as const, custom.workGap, (v) => setc('workGap', v), (v) => l[v])}
+					{@render toggle(l.hero, custom.cardGalHero, (v) => setc('cardGalHero', v))}
+					{@render toggle(l.titles, custom.cardGalTitles, (v) => setc('cardGalTitles', v))}
+				{:else}
+					{@render seg(['masonry', 'grid', 'big'] as const, custom.workLayout, (v) => setc('workLayout', v), (v) => l[v])}
+					{#if custom.workLayout !== 'big'}
+						{@render seg([2, 3, 4] as const, custom.workCols, (v) => setc('workCols', v), (v) => `${v} ${l.cols}`)}
+					{/if}
+					{@render seg(['tight', 'normal', 'wide'] as const, custom.workGap, (v) => setc('workGap', v), (v) => l[v])}
+					{@render toggle(l.titles, custom.workTitles, (v) => setc('workTitles', v))}
 				{/if}
-				{@render seg(['tight', 'normal', 'wide'] as const, custom.workGap, (v) => setc('workGap', v), (v) => l[v])}
-				{@render toggle(l.titles, custom.workTitles, (v) => setc('workTitles', v))}
 
 				<span class="label">{l.comm} <a class="link" href={resolve('/commissions')}>→</a></span>
 				{@render seg(['pictures', 'list'] as const, custom.commLayout, (v) => setc('commLayout', v), (v) => l[v])}
@@ -781,6 +868,37 @@
 		color: #111;
 		width: 100%;
 		resize: vertical;
+	}
+
+	.each summary {
+		cursor: pointer;
+		color: #555;
+		margin: 6px 0 4px;
+	}
+
+	.mini {
+		display: flex;
+		gap: 3px;
+	}
+
+	.mini button {
+		width: 24px;
+		height: 22px;
+		border: 1px solid #ddd;
+		font-size: 11px;
+	}
+
+	.mini button.on {
+		border-color: #111;
+		background: #f2f2f2;
+		font-weight: 700;
+	}
+
+	.sub {
+		display: block;
+		font-size: 12px;
+		color: #aaa;
+		margin: 4px 0 3px;
 	}
 
 	.sec {

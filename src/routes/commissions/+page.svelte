@@ -29,6 +29,7 @@
 					<Pic
 						pic={art[t.img]}
 						url={custom.on ? custom.tierPics[i] : null}
+						focus="t:{i}"
 						alt={t.name}
 						sizes="(max-width: 700px) 100vw, 33vw"
 					/>

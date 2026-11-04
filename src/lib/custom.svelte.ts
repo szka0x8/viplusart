@@ -1,4 +1,4 @@
-import { site, commissions } from './data.ts';
+import { site, commissions, gallery, type GalleryItem } from './data.ts';
 import { resolve } from '$app/paths';
 
 export const defaults = {
@@ -12,6 +12,23 @@ export const defaults = {
 	font: 'archivo',
 	layout: 'editorial' as 'editorial' | 'card',
 	radius: 24,
+	align: 'auto' as 'auto' | 'left' | 'center' | 'right',
+	cardPos: 'center' as 'left' | 'center' | 'right',
+	alignParts: {
+		title: 'auto',
+		info: 'auto',
+		buttons: 'auto',
+		terms: 'auto',
+		lists: 'auto',
+		socials: 'auto'
+	} as Record<'title' | 'info' | 'buttons' | 'terms' | 'lists' | 'socials', 'auto' | 'left' | 'center' | 'right'>,
+	avatarSide: 'left' as 'left' | 'right',
+	cardGalLayout: 'grid' as 'grid' | 'masonry' | 'big',
+	cardGalCols: 2 as 2 | 3 | 4,
+	cardGalHero: true,
+	cardGalTitles: false,
+	order: [] as number[],
+	focus: {} as Record<string, [number, number]>,
 	bodyFont: 'archivo',
 	titleScale: 1,
 	avatarShape: 'square' as 'square' | 'round' | 'arch',
@@ -47,6 +64,7 @@ export const custom = $state({
 	open: true,
 	tab: 'look' as 'look' | 'text' | 'pics' | 'pages' | 'save',
 	lang: 'ru' as 'ru' | 'en',
+	dragMode: 'order' as 'order' | 'crop',
 	...structuredClone(defaults),
 	bg: null as string | null,
 	bgName: '',
@@ -153,6 +171,40 @@ function list(v: string, fallback: string[]) {
 function tiersOf() {
 	return commissions.tiers.map((t) => ({ ...t, price: String(t.price) }));
 }
+
+function currentOrder(n: number) {
+	const o = (custom.on ? custom.order : []).filter((i) => i < n);
+	return [...o, ...[...Array(n).keys()].filter((i) => !o.includes(i))];
+}
+
+export function workItems(): GalleryItem[] {
+	if (custom.on && custom.workPics.length) return custom.workPics;
+	return currentOrder(gallery.length).map((i) => gallery[i]);
+}
+
+export function swapWork(a: number, b: number) {
+	if (a === b) return;
+	if (custom.on && custom.workPics.length) {
+		const w = [...custom.workPics];
+		[w[a], w[b]] = [w[b], w[a]];
+		custom.workPics = w;
+	} else {
+		const o = currentOrder(gallery.length);
+		[o[a], o[b]] = [o[b], o[a]];
+		custom.order = o;
+	}
+	custom.on = true;
+	save();
+}
+
+export const editing = {
+	get swap() {
+		return custom.panel && custom.dragMode === 'order';
+	},
+	get crop() {
+		return custom.panel && custom.dragMode === 'crop';
+	}
+};
 
 export const view = {
 	get o(): Design {
