@@ -49,7 +49,7 @@ export const commissions = {
 		{ section: 'art', name: 'tier one', price: '??', img: '1.jpg' },
 		{ section: 'art', name: 'tier two', price: '??', img: '2.jpg' },
 		{ section: 'sketches', name: 'sketch one', price: '??', img: '3.jpg' },
-		{ section: 'sketches', name: 'sketch two', price: '??', img: '1.jpg' }
+		{ section: 'sketches', name: 'sketch two', price: '??', img: '4.jpg' }
 	],
 	payment: 'payment details in dms',
 	terms: ['term one', 'term two', 'term three', 'term four'],
