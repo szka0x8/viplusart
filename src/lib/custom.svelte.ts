@@ -39,6 +39,18 @@ export const defaults = {
 	avatarShape: 'square' as 'square' | 'round' | 'arch',
 	bw: false,
 	grain: 0,
+	nameFx: 'none' as 'none' | 'glow' | 'shimmer' | 'type' | 'glitch' | 'float' | 'outline' | 'sparkle',
+	fxColor: '#b98cff',
+	fxGrad: false,
+	fx2: '#ff9ad5',
+	nameGrad: false,
+	n1: '#151515',
+	n2: '#b98cff',
+	nameAngle: 90,
+	reveal: false,
+	lift: false,
+	pageFade: false,
+	particles: 'none' as 'none' | 'dust' | 'stars' | 'petals',
 	showTags: true,
 	showStatus: true,
 	showRecent: true,
@@ -48,6 +60,15 @@ export const defaults = {
 	workCols: 3 as 2 | 3 | 4,
 	workGap: 'normal' as 'tight' | 'normal' | 'wide',
 	workTitles: true,
+	grads: {
+		paper: { on: false, c2: '#d9d2c5', angle: 135 },
+		page: { on: false, c2: '#d9d2c5', angle: 135 },
+		ink: { on: false, c2: '#6a3df0', angle: 90 },
+		mute: { on: false, c2: '#b98cff', angle: 90 },
+		rule: { on: false, c2: '#b98cff', angle: 90 },
+		line: { on: false, c2: '#b98cff', angle: 90 },
+		tint: { on: false, c2: '#ff9ad5', angle: 135 }
+	} as Record<'paper' | 'page' | 'ink' | 'mute' | 'rule' | 'line' | 'tint', { on: boolean; c2: string; angle: number }>,
 	text: {
 		name: '',
 		tags: '',
@@ -98,6 +119,7 @@ export function load() {
 			const { text, ...rest } = saved;
 			Object.assign(custom, rest);
 			if (text) custom.text = { ...structuredClone(defaults.text), ...text };
+			custom.grads = { ...structuredClone(defaults.grads), ...(rest.grads ?? {}) };
 		}
 	} catch {}
 }

@@ -2,12 +2,13 @@
 	import { site, commissions } from './data.ts';
 	import { custom, view } from './custom.svelte.ts';
 	import Pic from './Pic.svelte';
+	import Name from './Name.svelte';
 	import { resolve } from '$app/paths';
 </script>
 
 <main>
 	<div class="card">
-		<h1>{view.name}</h1>
+		<h1 class="name"><Name /></h1>
 
 		<div class="body" class:flip={view.o.avatarSide === 'right'}>
 			<div class="avatar {view.o.avatarShape}">
@@ -67,7 +68,11 @@
 	.card {
 		width: min(800px, 100%);
 		padding: clamp(24px, 4vw, 40px);
-		background: color-mix(in srgb, var(--paper) var(--card-alpha, 82%), transparent);
+		background: linear-gradient(
+			var(--paper-angle, 135deg),
+			color-mix(in srgb, var(--paper) var(--card-alpha, 82%), transparent),
+			color-mix(in srgb, var(--paper2) var(--card-alpha, 82%), transparent)
+		);
 		border: 1px solid var(--line);
 		border-radius: var(--radius);
 		box-shadow: 0 24px 60px rgb(0 0 0 / 0.12);

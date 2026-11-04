@@ -29,7 +29,11 @@
 	.card {
 		width: min(760px, 100%);
 		padding: clamp(22px, 4vw, 40px);
-		background: color-mix(in srgb, var(--paper) var(--card-alpha, 82%), transparent);
+		background: linear-gradient(
+			var(--paper-angle, 135deg),
+			color-mix(in srgb, var(--paper) var(--card-alpha, 82%), transparent),
+			color-mix(in srgb, var(--paper2) var(--card-alpha, 82%), transparent)
+		);
 		border: 1px solid var(--line);
 		border-radius: var(--radius);
 		box-shadow: 0 24px 60px rgb(0 0 0 / 0.12);

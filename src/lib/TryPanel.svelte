@@ -48,6 +48,22 @@
 			lines: 'тонкие линии',
 			effects: 'эффекты',
 			bw: 'чёрно-белые картинки',
+			nameFx: 'эффект названия',
+			fx: { none: 'нет', glow: 'свечение', shimmer: 'блеск', type: 'печать', glitch: 'глитч', float: 'парение', outline: 'контур', sparkle: 'блёстки' },
+			nameColor: 'цвет названия',
+			gradTip: 'градиент',
+			solid: 'обычный',
+			gradient: 'градиент',
+			angle: 'угол',
+			fxGrad: 'градиент эффектов',
+			color1: 'цвет 1',
+			color2: 'цвет 2',
+			fxColor: 'цвет эффектов',
+			reveal: 'появление при прокрутке',
+			lift: 'подъём при наведении',
+			pageFade: 'плавные переходы',
+			particles: 'частицы',
+			parts2: { none: 'нет', dust: 'пыль', stars: 'звёзды', petals: 'лепестки' },
 			grain: 'зерно',
 			name: 'название',
 			tags: 'о тебе (через запятую)',
@@ -149,6 +165,22 @@
 			lines: 'thin lines',
 			effects: 'effects',
 			bw: 'black & white pictures',
+			nameFx: 'name effect',
+			fx: { none: 'none', glow: 'glow', shimmer: 'shimmer', type: 'typing', glitch: 'glitch', float: 'float', outline: 'outline', sparkle: 'sparkle' },
+			nameColor: 'name color',
+			gradTip: 'gradient',
+			solid: 'normal',
+			gradient: 'gradient',
+			angle: 'angle',
+			fxGrad: 'effect gradient',
+			color1: 'color 1',
+			color2: 'color 2',
+			fxColor: 'effect color',
+			reveal: 'fade in on scroll',
+			lift: 'lift on hover',
+			pageFade: 'smooth page change',
+			particles: 'particles',
+			parts2: { none: 'none', dust: 'dust', stars: 'stars', petals: 'petals' },
 			grain: 'grain',
 			name: 'name',
 			tags: 'about you (split with commas)',
@@ -359,6 +391,39 @@
 	</div>
 {/snippet}
 
+{#snippet colorRow(k: 'paper' | 'page' | 'ink' | 'mute' | 'rule' | 'line' | 'tint', label: string)}
+	<div class="row">
+		<span>{label}</span>
+		<span class="pick">
+			<input type="text" bind:value={custom[k]} oninput={changed} spellcheck="false" />
+			<ColorPick bind:value={custom[k]} onchange={changed} />
+			<button
+				class="gbtn"
+				class:on={custom.grads[k].on}
+				title={l.gradTip}
+				onclick={() => {
+					custom.grads[k].on = !custom.grads[k].on;
+					changed();
+				}}>⇄</button
+			>
+		</span>
+	</div>
+	{#if custom.grads[k].on}
+		<div class="row sub2">
+			<span>↳ {l.color2}</span>
+			<span class="pick">
+				<input type="text" bind:value={custom.grads[k].c2} oninput={changed} spellcheck="false" />
+				<ColorPick bind:value={custom.grads[k].c2} onchange={changed} />
+				<span class="gpad"></span>
+			</span>
+		</div>
+		<label class="row sub2">
+			<span>↳ {l.angle}</span>
+			<input type="range" min="0" max="360" step="5" bind:value={custom.grads[k].angle} oninput={changed} />
+		</label>
+	{/if}
+{/snippet}
+
 {#snippet toggle(label: string, value: boolean, flip: (v: boolean) => void)}
 	<div class="row">
 		<span>{label}</span>
@@ -420,13 +485,7 @@
 
 				<span class="label">{l.colors}</span>
 				{#each colors as c}
-					<div class="row">
-						<span>{c === 'paper' && custom.layout === 'card' ? l.cardBg : l[colorNames[c]]}</span>
-						<span class="pick">
-							<input type="text" bind:value={custom[c]} oninput={changed} spellcheck="false" />
-							<ColorPick bind:value={custom[c]} onchange={changed} />
-						</span>
-					</div>
+					{@render colorRow(c, c === 'paper' && custom.layout === 'card' ? l.cardBg : l[colorNames[c]])}
 				{/each}
 
 				{#if custom.layout === 'card'}
@@ -466,7 +525,59 @@
 					{/each}
 				</div>
 
+				<span class="label">{l.nameFx}</span>
+				<div class="fxgrid">
+					{#each ['none', 'glow', 'shimmer', 'type', 'glitch', 'float', 'outline', 'sparkle'] as const as v}
+						<button class:on={custom.nameFx === v} onclick={() => setc('nameFx', v)}>{l.fx[v]}</button>
+					{/each}
+				</div>
+				<div class="row">
+					<span>{custom.fxGrad ? `${l.fxColor} 1` : l.fxColor}</span>
+					<span class="pick">
+						<input type="text" bind:value={custom.fxColor} oninput={changed} spellcheck="false" />
+						<ColorPick bind:value={custom.fxColor} onchange={changed} />
+					</span>
+				</div>
+				{@render toggle(l.fxGrad, custom.fxGrad, (v) => setc('fxGrad', v))}
+				{#if custom.fxGrad}
+					<div class="row">
+						<span>{l.fxColor} 2</span>
+						<span class="pick">
+							<input type="text" bind:value={custom.fx2} oninput={changed} spellcheck="false" />
+							<ColorPick bind:value={custom.fx2} onchange={changed} />
+						</span>
+					</div>
+				{/if}
+
+				<span class="label">{l.nameColor}</span>
+				{@render seg([false, true] as const, custom.nameGrad, (v) => setc('nameGrad', v), (v) => (v ? l.gradient : l.solid))}
+				{#if custom.nameGrad}
+					<div class="row">
+						<span>{l.color1}</span>
+						<span class="pick">
+							<input type="text" bind:value={custom.n1} oninput={changed} spellcheck="false" />
+							<ColorPick bind:value={custom.n1} onchange={changed} />
+						</span>
+					</div>
+					<div class="row">
+						<span>{l.color2}</span>
+						<span class="pick">
+							<input type="text" bind:value={custom.n2} oninput={changed} spellcheck="false" />
+							<ColorPick bind:value={custom.n2} onchange={changed} />
+						</span>
+					</div>
+					<label class="row">
+						<span>{l.angle}</span>
+						<input type="range" min="0" max="360" step="5" bind:value={custom.nameAngle} oninput={changed} />
+					</label>
+				{/if}
+
 				<span class="label">{l.effects}</span>
+				{@render toggle(l.reveal, custom.reveal, (v) => setc('reveal', v))}
+				{@render toggle(l.lift, custom.lift, (v) => setc('lift', v))}
+				{@render toggle(l.pageFade, custom.pageFade, (v) => setc('pageFade', v))}
+				<span class="sub">{l.particles}</span>
+				{@render seg(['none', 'dust', 'stars', 'petals'] as const, custom.particles, (v) => setc('particles', v), (v) => l.parts2[v])}
 				{@render toggle(l.bw, custom.bw, (v) => setc('bw', v))}
 				<label class="row">
 					<span>{l.grain}</span>
@@ -563,13 +674,7 @@
 						<span>{l.blur}</span>
 						<input type="range" min="0" max="30" step="1" bind:value={custom.bgBlur} oninput={changed} />
 					</label>
-					<div class="row">
-						<span>{l.tint}</span>
-						<span class="pick">
-							<input type="text" bind:value={custom.tint} oninput={changed} spellcheck="false" />
-							<ColorPick bind:value={custom.tint} onchange={changed} />
-						</span>
-					</div>
+					{@render colorRow('tint', l.tint)}
 					<label class="row">
 						<span>{l.tintAmount}</span>
 						<input type="range" min="0" max="0.9" step="0.05" bind:value={custom.tintAmount} oninput={changed} />
@@ -917,6 +1022,49 @@
 		cursor: pointer;
 		color: #555;
 		margin: 6px 0 4px;
+	}
+
+	.gbtn {
+		width: 22px;
+		height: 22px;
+		border: 1px solid #ccc;
+		font-size: 12px;
+		line-height: 1;
+		color: #999;
+	}
+
+	.gbtn.on {
+		border-color: #111;
+		background: #111;
+		color: #fff;
+	}
+
+	.gpad {
+		width: 22px;
+	}
+
+	.sub2 > span:first-child {
+		color: #888;
+		padding-left: 6px;
+	}
+
+	.fxgrid {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		gap: 4px;
+		margin-bottom: 6px;
+	}
+
+	.fxgrid button {
+		border: 1px solid #ddd;
+		padding: 5px 2px;
+		font-size: 12px;
+	}
+
+	.fxgrid button.on {
+		border-color: #111;
+		background: #f2f2f2;
+		font-weight: 700;
 	}
 
 	.mini {

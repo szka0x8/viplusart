@@ -2,6 +2,8 @@
 	import '@fontsource-variable/archivo/wdth.css';
 	import favicon from '#lib/assets/favicon.svg';
 	import { onMount } from 'svelte';
+	import { onNavigate } from '$app/navigation';
+	import Particles from '#lib/Particles.svelte';
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
 	import { site } from '#lib/data.ts';
@@ -15,6 +17,17 @@
 	let bare = $derived(view.o.layout === 'card' && page.route.id !== '/try');
 
 	let grainUrl = $state('');
+
+	onNavigate((nav) => {
+		if (!view.o.pageFade || !document.startViewTransition) return;
+		if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+		return new Promise((done) => {
+			document.startViewTransition(async () => {
+				done();
+				await nav.complete;
+			});
+		});
+	});
 
 	onMount(() => {
 		load();
@@ -64,8 +77,31 @@
 		if (custom.on && custom.titleScale !== 1) html.style.setProperty('--title-scale', String(custom.titleScale));
 		else html.style.removeProperty('--title-scale');
 		html.classList.toggle('bw', custom.on && custom.bw);
+		for (const k of ['paper', 'page', 'ink', 'mute', 'rule', 'line', 'tint'] as const) {
+			const g = custom.grads?.[k];
+			const on = custom.on && !!g?.on;
+			if (on) {
+				html.style.setProperty(`--${k}2`, g.c2);
+				html.style.setProperty(`--${k}-angle`, `${g.angle}deg`);
+			} else {
+				html.style.removeProperty(`--${k}2`);
+				html.style.removeProperty(`--${k}-angle`);
+			}
+			if (k === 'ink' || k === 'mute' || k === 'rule' || k === 'line') html.classList.toggle(`g-${k}`, on);
+		}
+		if (custom.on) html.style.setProperty('--tint', custom.tint);
+		else html.style.removeProperty('--tint');
 		html.classList.toggle('card', view.o.layout === 'card');
 		html.classList.toggle('edit-swap', editing.swap);
+		html.classList.toggle('fx-reveal', view.o.reveal);
+		html.classList.toggle('fx-lift', view.o.lift);
+		if (custom.on) {
+			html.style.setProperty('--fx', custom.fxColor);
+			html.style.setProperty('--fx2', custom.fxGrad ? custom.fx2 : custom.fxColor);
+			html.style.setProperty('--n1', custom.n1);
+			html.style.setProperty('--n2', custom.n2);
+			html.style.setProperty('--name-angle', `${custom.nameAngle}deg`);
+		} else for (const k of ['fx', 'fx2', 'n1', 'n2', 'name-angle']) html.style.removeProperty(`--${k}`);
 		html.classList.toggle('edit-crop', editing.crop);
 		if (custom.on) html.style.setProperty('--radius', `${custom.radius}px`);
 		else html.style.removeProperty('--radius');
@@ -113,7 +149,7 @@
 		style:filter={`blur(${custom.bgBlur}px)`}
 	></div>
 	{#if custom.tintAmount > 0}
-		<div class="tint" style:background={custom.tint} style:opacity={custom.tintAmount}></div>
+		<div class="tint" style:opacity={custom.tintAmount}></div>
 	{/if}
 {/if}
 
@@ -121,6 +157,10 @@
 
 {#if custom.on && custom.grain > 0}
 	<div class="grain" style:opacity={custom.grain} style:background-image={grainUrl ? `url(${grainUrl})` : 'none'}></div>
+{/if}
+
+{#if view.o.particles !== 'none'}
+	<Particles kind={view.o.particles} color={view.o.fxColor} color2={view.o.fxGrad ? view.o.fx2 : view.o.fxColor} />
 {/if}
 
 {#if custom.panel}
@@ -142,6 +182,16 @@
 		--line: #d3cec4;
 		--rule: var(--ink);
 		--page: var(--paper);
+		--tint: #000000;
+		--paper2: var(--paper);
+		--page2: var(--page);
+		--ink2: var(--ink);
+		--mute2: var(--mute);
+		--rule2: var(--rule);
+		--line2: var(--line);
+		--tint2: var(--tint);
+		--fx: #b98cff;
+		--fx2: var(--fx);
 		--radius: 24px;
 		--pad: clamp(16px, 4vw, 48px);
 	}
@@ -153,7 +203,7 @@
 	}
 
 	:global(body) {
-		background: var(--paper);
+		background: linear-gradient(var(--paper-angle, 135deg), var(--paper), var(--paper2));
 		color: var(--ink);
 		font-family: var(--body, 'Archivo Variable'), system-ui, sans-serif;
 		font-size: 15px;
@@ -198,6 +248,212 @@
 		color: var(--paper);
 	}
 
+	:global(html.g-ink :where(main, header) :where(p, li, h2, h3, dt, dd, a:not(.btn, .pill, .back))) {
+		background: linear-gradient(var(--ink-angle, 90deg), var(--ink), var(--ink2));
+		-webkit-background-clip: text;
+		background-clip: text;
+		color: transparent !important;
+	}
+
+	:global(html:is(.g-ink, .g-mute) :is(footer span, .status, .mail span, figcaption, .payment, .head span)) {
+		background: linear-gradient(var(--mute-angle, 90deg), var(--mute), var(--mute2));
+		-webkit-background-clip: text;
+		background-clip: text;
+		color: transparent !important;
+	}
+
+	:global(html.g-rule :is(header, .links, .recent .head, .tiers, .list)) {
+		border-image: linear-gradient(var(--rule-angle, 90deg), var(--rule), var(--rule2)) 1;
+	}
+
+	:global(html.g-line :is(.links a, .list li, footer, hr.sep)) {
+		border-image: linear-gradient(var(--line-angle, 90deg), var(--line), var(--line2)) 1;
+	}
+
+	:global(.nm.grad) {
+		background: linear-gradient(var(--name-angle, 90deg), var(--n1), var(--n2));
+		-webkit-background-clip: text;
+		background-clip: text;
+		color: transparent;
+	}
+
+	:global(.nm.fx-glow) {
+		animation: fx-glow 3s ease-in-out infinite;
+	}
+
+	@keyframes -global-fx-glow {
+		0%,
+		100% {
+			filter: drop-shadow(0 0 0.05em color-mix(in srgb, var(--fx) 55%, transparent));
+		}
+		50% {
+			filter: drop-shadow(0 0 0.12em var(--fx)) drop-shadow(0 0 0.26em color-mix(in srgb, var(--fx2) 70%, transparent));
+		}
+	}
+
+	:global(.nm.fx-shimmer) {
+		background: linear-gradient(100deg, var(--ink) 38%, var(--fx) 47%, var(--fx2) 53%, var(--ink) 62%) 0 0 / 250% 100%;
+		-webkit-background-clip: text;
+		background-clip: text;
+		color: transparent;
+		animation: fx-shimmer 4s linear infinite;
+	}
+
+	:global(.nm.fx-shimmer.grad) {
+		background:
+			linear-gradient(100deg, transparent 38%, var(--fx) 47%, var(--fx2) 53%, transparent 62%) 0 0 / 250% 100%,
+			linear-gradient(var(--name-angle, 90deg), var(--n1), var(--n2));
+		-webkit-background-clip: text;
+		background-clip: text;
+		animation: fx-shimmer2 4s linear infinite;
+	}
+
+	@keyframes -global-fx-shimmer {
+		from {
+			background-position: 100% 0;
+		}
+		to {
+			background-position: -150% 0;
+		}
+	}
+
+	@keyframes -global-fx-shimmer2 {
+		from {
+			background-position:
+				100% 0,
+				0 0;
+		}
+		to {
+			background-position:
+				-150% 0,
+				0 0;
+		}
+	}
+
+	:global(.nm.fx-type) {
+		animation: fx-type 1.6s steps(18) both;
+	}
+
+	@keyframes -global-fx-type {
+		from {
+			clip-path: inset(0 100% 0 0);
+		}
+		to {
+			clip-path: inset(0 0 0 0);
+		}
+	}
+
+	:global(.nm.fx-float) {
+		animation: fx-float 4s ease-in-out infinite;
+	}
+
+	@keyframes -global-fx-float {
+		0%,
+		100% {
+			transform: translateY(0);
+		}
+		50% {
+			transform: translateY(-0.08em);
+		}
+	}
+
+	:global(.nm.fx-outline) {
+		color: transparent;
+		-webkit-text-stroke: max(1px, 0.022em) var(--ink);
+	}
+
+	:global(.nm.fx-outline.grad) {
+		-webkit-text-stroke: max(1px, 0.022em) var(--n1);
+		background: none;
+	}
+
+	:global(.nm.fx-glitch::before),
+	:global(.nm.fx-glitch::after) {
+		content: attr(data-text);
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		opacity: 0;
+		background: none;
+		-webkit-background-clip: initial;
+		background-clip: initial;
+	}
+
+	:global(.nm.fx-glitch::before) {
+		color: var(--fx);
+		animation: fx-glitch 3.2s steps(1) infinite;
+	}
+
+	:global(.nm.fx-glitch::after) {
+		color: var(--fx2);
+		animation: fx-glitch 3.2s steps(1) infinite reverse;
+	}
+
+	@keyframes -global-fx-glitch {
+		0%,
+		88%,
+		100% {
+			opacity: 0;
+			transform: none;
+			clip-path: inset(0 0 0 0);
+		}
+		90% {
+			opacity: 0.85;
+			transform: translate(-0.04em, 0.015em);
+			clip-path: inset(10% 0 55% 0);
+		}
+		93% {
+			opacity: 0.85;
+			transform: translate(0.04em, -0.015em);
+			clip-path: inset(55% 0 10% 0);
+		}
+		96% {
+			opacity: 0.85;
+			transform: translate(-0.03em, 0);
+			clip-path: inset(35% 0 35% 0);
+		}
+	}
+
+	:global(html.fx-reveal main figure),
+	:global(html.fx-reveal main .tier) {
+		animation: fx-reveal linear both;
+		animation-timeline: view();
+		animation-range: entry 0% entry 45%;
+	}
+
+	@keyframes -global-fx-reveal {
+		from {
+			opacity: 0;
+			transform: translateY(28px);
+		}
+		to {
+			opacity: 1;
+			transform: none;
+		}
+	}
+
+	:global(html.fx-lift main figure img),
+	:global(html.fx-lift main .tier img),
+	:global(html.fx-lift .strip img) {
+		transition: transform 0.25s ease;
+	}
+
+	:global(html.fx-lift main figure:hover img),
+	:global(html.fx-lift main .tier:hover img),
+	:global(html.fx-lift .strip a:hover img) {
+		transform: translateY(-4px) scale(1.02);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		:global(.nm[class*='fx-']),
+		:global(.nm[class*='fx-']::before),
+		:global(.nm[class*='fx-']::after),
+		:global(html.fx-reveal main figure),
+		:global(html.fx-reveal main .tier) {
+			animation: none !important;
+		}
+	}
+
 	:global(html.edit-swap [data-swap]) {
 		cursor: grab;
 		user-select: none;
@@ -213,6 +469,7 @@
 	}
 
 	:global(.swap-drag) {
+		animation: none !important;
 		position: relative;
 		z-index: 30;
 		opacity: 0.85;
@@ -242,10 +499,11 @@
 	}
 
 	:global(html.card body) {
-		background: var(--page);
+		background: linear-gradient(var(--page-angle, 135deg), var(--page), var(--page2));
 	}
 
 	.tint {
+		background: linear-gradient(var(--tint-angle, 135deg), var(--tint), var(--tint2));
 		position: fixed;
 		inset: 0;
 		z-index: -1;

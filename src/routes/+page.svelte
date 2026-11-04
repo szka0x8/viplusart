@@ -2,6 +2,7 @@
 	import { site, gallery, commissions } from '#lib/data.ts';
 	import { custom, view, workItems } from '#lib/custom.svelte.ts';
 	import Pic from '#lib/Pic.svelte';
+	import Name from '#lib/Name.svelte';
 	import { resolve } from '$app/paths';
 	import HomeCard from '#lib/HomeCard.svelte';
 
@@ -16,7 +17,7 @@
 	<HomeCard />
 {:else}
 <main>
-	<h1>{view.name}</h1>
+	<h1 class="name"><Name /></h1>
 
 	<section class="intro" class:flip={view.o.avatarSide === 'right'}>
 		<div class="avatar {view.o.avatarShape}">
