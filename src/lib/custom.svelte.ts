@@ -10,6 +10,8 @@ export const defaults = {
 	bgOpacity: 0.35,
 	bgBlur: 4,
 	font: 'archivo',
+	layout: 'editorial' as 'editorial' | 'card',
+	radius: 24,
 	bodyFont: 'archivo',
 	titleScale: 1,
 	avatarShape: 'square' as 'square' | 'round' | 'arch',
@@ -28,6 +30,10 @@ export const defaults = {
 		name: '',
 		tags: '',
 		note: '',
+		payment: '',
+		terms: '',
+		will: '',
+		wont: '',
 		tiers: [] as { name: string; price: string }[]
 	}
 };
@@ -134,6 +140,20 @@ export function applyShare(hash: string) {
 	}
 }
 
+function list(v: string, fallback: string[]) {
+	const t = v.trim();
+	return t
+		? t
+				.split(',')
+				.map((s) => s.trim())
+				.filter(Boolean)
+		: fallback;
+}
+
+function tiersOf() {
+	return commissions.tiers.map((t) => ({ ...t, price: String(t.price) }));
+}
+
 export const view = {
 	get o(): Design {
 		return custom.on ? custom : defaults;
@@ -152,6 +172,33 @@ export const view = {
 	},
 	get note() {
 		return (custom.on && custom.text.note.trim()) || commissions.note;
+	},
+	get payment() {
+		return (custom.on && custom.text.payment.trim()) || commissions.payment;
+	},
+	get terms() {
+		const t = custom.on ? custom.text.terms.trim() : '';
+		return t
+			? t
+					.split('\n')
+					.map((s) => s.trim())
+					.filter(Boolean)
+			: commissions.terms;
+	},
+	get will() {
+		return list(custom.on ? custom.text.will : '', commissions.will);
+	},
+	get wont() {
+		return list(custom.on ? custom.text.wont : '', commissions.wont);
+	},
+	get sections() {
+		const out: { title: string; tiers: (ReturnType<typeof tiersOf>[number] & { i: number })[] }[] = [];
+		this.tiers.forEach((t, i) => {
+			let sec = out.find((s) => s.title === t.section);
+			if (!sec) out.push((sec = { title: t.section, tiers: [] }));
+			sec.tiers.push({ ...t, i });
+		});
+		return out;
 	},
 	get tiers() {
 		return commissions.tiers.map((t, i) => {

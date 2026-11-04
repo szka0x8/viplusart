@@ -46,9 +46,19 @@ export const commissions = {
 	open: true,
 	currency: '$',
 	tiers: [
-		{ name: 'tier one', price: '??', img: '1.jpg' },
-		{ name: 'tier two', price: '??', img: '2.jpg' },
-		{ name: 'tier three', price: '??', img: '3.jpg' }
+		{ section: 'art', name: 'tier one', price: '??', img: '1.jpg' },
+		{ section: 'art', name: 'tier two', price: '??', img: '2.jpg' },
+		{ section: 'sketches', name: 'sketch one', price: '??', img: '3.jpg' },
+		{ section: 'sketches', name: 'sketch two', price: '??', img: '1.jpg' }
 	],
+	payment: 'payment details in dms',
+	terms: [
+		'full payment upfront',
+		'no refunds once i start',
+		'you get a sketch to approve first',
+		'commercial use costs extra'
+	],
+	will: ['original characters', 'fanart', 'couples'],
+	wont: ['mecha', 'nsfw'],
 	note: 'to order, message me with your idea and references'
 };

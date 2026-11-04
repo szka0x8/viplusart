@@ -3,6 +3,7 @@
 	import Lightbox from '#lib/Lightbox.svelte';
 	import { custom, defaults, view } from '#lib/custom.svelte.ts';
 	import Pic from '#lib/Pic.svelte';
+	import GalleryCard from '#lib/GalleryCard.svelte';
 
 	let o = $derived(custom.on ? custom : defaults);
 	let items = $derived(custom.on && custom.workPics.length ? custom.workPics : gallery);
@@ -15,6 +16,9 @@
 	<title>work · {view.name}</title>
 </svelte:head>
 
+{#if view.o.layout === 'card'}
+	<GalleryCard {items} onopen={(i) => (open = i)} />
+{:else}
 <main>
 	<div class="head">
 		<h1>work</h1>
@@ -41,6 +45,7 @@
 		{/each}
 	</div>
 </main>
+{/if}
 
 <Lightbox {items} bind:index={open} />
 

@@ -2,6 +2,7 @@
 	import { site, art, commissions as c } from '#lib/data.ts';
 	import { custom, defaults, view } from '#lib/custom.svelte.ts';
 	import Pic from '#lib/Pic.svelte';
+	import CommCard from '#lib/CommCard.svelte';
 
 	let layout = $derived(custom.on ? custom.commLayout : defaults.commLayout);
 	let shape = $derived(custom.on ? custom.commShape : defaults.commShape);
@@ -12,6 +13,9 @@
 	<title>commissions · {view.name}</title>
 </svelte:head>
 
+{#if view.o.layout === 'card'}
+	<CommCard />
+{:else}
 <main>
 	<div class="head">
 		<h1>commissions</h1>
@@ -53,6 +57,7 @@
 		<a href="mailto:{site.email}">{site.email}</a>
 	</p>
 </main>
+{/if}
 
 <style>
 	main {

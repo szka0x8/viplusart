@@ -3,6 +3,7 @@
 	import { custom, view } from '#lib/custom.svelte.ts';
 	import Pic from '#lib/Pic.svelte';
 	import { resolve } from '$app/paths';
+	import HomeCard from '#lib/HomeCard.svelte';
 
 	let items = $derived(custom.on && custom.workPics.length ? custom.workPics : gallery);
 </script>
@@ -11,6 +12,9 @@
 	<title>{view.name}</title>
 </svelte:head>
 
+{#if view.o.layout === 'card'}
+	<HomeCard />
+{:else}
 <main>
 	<h1>{view.name}</h1>
 
@@ -69,6 +73,7 @@
 		</section>
 	{/if}
 </main>
+{/if}
 
 <style>
 	main {

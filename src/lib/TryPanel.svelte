@@ -26,6 +26,10 @@
 			title: 'настройки',
 			note: 'это видишь только ты',
 			tabs: { look: 'вид', text: 'текст', pics: 'картинки', pages: 'страницы', save: 'сохранить' },
+			layout: 'макет',
+			editorial: 'строгий',
+			card: 'мягкий',
+			radius: 'скругление',
 			start: 'начать с',
 			font: 'шрифт названия',
 			bodyFont: 'шрифт текста',
@@ -44,6 +48,10 @@
 			tiers: 'цены',
 			price: 'цена',
 			order: 'как заказать',
+			payment: 'оплата',
+			terms: 'условия (каждое с новой строки)',
+			will: 'рисую (через запятую)',
+			wont: 'не рисую (через запятую)',
 			avatar: 'аватар',
 			shape: 'форма аватара',
 			square: 'квадрат',
@@ -94,6 +102,10 @@
 			title: 'settings',
 			note: 'only you see this',
 			tabs: { look: 'look', text: 'text', pics: 'pictures', pages: 'pages', save: 'save' },
+			layout: 'layout',
+			editorial: 'clean',
+			card: 'soft',
+			radius: 'roundness',
 			start: 'start from',
 			font: 'title font',
 			bodyFont: 'text font',
@@ -112,6 +124,10 @@
 			tiers: 'prices',
 			price: 'price',
 			order: 'how to order',
+			payment: 'payment',
+			terms: 'terms (one per line)',
+			will: 'i do (split with commas)',
+			wont: "i don't (split with commas)",
 			avatar: 'avatar',
 			shape: 'avatar shape',
 			square: 'square',
@@ -330,6 +346,13 @@
 
 		<div class="body">
 			{#if custom.tab === 'look'}
+				<span class="label">{l.layout}</span>
+				{@render seg(['editorial', 'card'] as const, custom.layout, (v) => setc('layout', v), (v) => l[v])}
+				<label class="row">
+					<span>{l.radius}</span>
+					<input type="range" min="0" max="48" step="1" bind:value={custom.radius} oninput={changed} />
+				</label>
+
 				<span class="label">{l.start}</span>
 				<div class="swatches">
 					{#each presets as p}
@@ -396,6 +419,9 @@
 
 				<span class="label">{l.tiers}</span>
 				{#each commissions.tiers as tr, i}
+					{#if i === 0 || commissions.tiers[i - 1].section !== tr.section}
+						<span class="sec">{tr.section}</span>
+					{/if}
 					<div class="tier">
 						<input
 							type="text"
@@ -414,6 +440,22 @@
 				<label class="field">
 					<span>{l.order}</span>
 					<textarea rows="2" bind:value={custom.text.note} oninput={changed} placeholder={commissions.note}></textarea>
+				</label>
+				<label class="field">
+					<span>{l.payment}</span>
+					<input type="text" bind:value={custom.text.payment} oninput={changed} placeholder={commissions.payment} />
+				</label>
+				<label class="field">
+					<span>{l.terms}</span>
+					<textarea rows="4" bind:value={custom.text.terms} oninput={changed} placeholder={commissions.terms.join('\n')}></textarea>
+				</label>
+				<label class="field">
+					<span>{l.will}</span>
+					<input type="text" bind:value={custom.text.will} oninput={changed} placeholder={commissions.will.join(', ')} />
+				</label>
+				<label class="field">
+					<span>{l.wont}</span>
+					<input type="text" bind:value={custom.text.wont} oninput={changed} placeholder={commissions.wont.join(', ')} />
 				</label>
 			{:else if custom.tab === 'pics'}
 				{@render file(l.avatar, custom.avatarUrl ? '✓' : '', pickAvatar, custom.avatarUrl ? () => (custom.avatarUrl = null) : null)}
@@ -739,6 +781,15 @@
 		color: #111;
 		width: 100%;
 		resize: vertical;
+	}
+
+	.sec {
+		display: block;
+		font-size: 11px;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		color: #aaa;
+		margin: 6px 0 2px;
 	}
 
 	.tier {

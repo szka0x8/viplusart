@@ -12,6 +12,8 @@
 
 	let { children }: LayoutProps = $props();
 
+	let bare = $derived(view.o.layout === 'card' && page.route.id !== '/try');
+
 	onMount(load);
 
 	$effect(() => {
@@ -47,6 +49,9 @@
 		if (custom.on && custom.titleScale !== 1) html.style.setProperty('--title-scale', String(custom.titleScale));
 		else html.style.removeProperty('--title-scale');
 		html.classList.toggle('bw', custom.on && custom.bw);
+		html.classList.toggle('card', view.o.layout === 'card');
+		if (custom.on) html.style.setProperty('--radius', `${custom.radius}px`);
+		else html.style.removeProperty('--radius');
 	});
 
 </script>
@@ -55,6 +60,7 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
+{#if !bare}
 <header>
 	<a class="home" href={resolve('/')}>{view.name}</a>
 	<nav>
@@ -63,6 +69,7 @@
 		<a href="mailto:{site.email}">contact</a>
 	</nav>
 </header>
+{/if}
 
 {#if custom.on && custom.bg}
 	<div
@@ -83,10 +90,12 @@
 	<TryPanel />
 {/if}
 
+{#if !bare}
 <footer>
 	<span>© {new Date().getFullYear()} {view.name.toLowerCase()}</span>
 	<span>all art is mine, don't repost or use for ai</span>
 </footer>
+{/if}
 
 <style>
 	:global(:root) {
@@ -95,6 +104,7 @@
 		--mute: #77736b;
 		--line: #d3cec4;
 		--rule: var(--ink);
+		--radius: 24px;
 		--pad: clamp(16px, 4vw, 48px);
 	}
 
@@ -148,6 +158,10 @@
 	:global(::selection) {
 		background: var(--ink);
 		color: var(--paper);
+	}
+
+	:global(html.card main img) {
+		border-radius: calc(var(--radius) * 0.6);
 	}
 
 	:global(html.bw main img) {
