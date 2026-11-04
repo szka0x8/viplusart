@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { site, art, commissions as c } from '#lib/data.ts';
-	import { custom, defaults, view } from '#lib/custom.svelte.ts';
+	import { custom, defaults, view, editing, swapTiers } from '#lib/custom.svelte.ts';
+	import { swappable } from '#lib/swap.ts';
 	import Pic from '#lib/Pic.svelte';
 	import CommCard from '#lib/CommCard.svelte';
 
@@ -24,12 +25,12 @@
 
 	{#if layout === 'pictures'}
 		<div class="tiers">
-			{#each view.tiers as t, i}
-				<div class="tier {shape}">
+			{#each view.tiers as t (t.i)}
+				<div class="tier {shape}" use:swappable={{ i: t.i, enabled: editing.swap, onswap: swapTiers }}>
 					<Pic
 						pic={art[t.img]}
-						url={custom.on ? custom.tierPics[i] : null}
-						focus="t:{i}"
+						url={custom.on ? custom.tierPics[t.i] : null}
+						focus="t:{t.i}"
 						alt={t.name}
 						sizes="(max-width: 700px) 100vw, 33vw"
 					/>
@@ -42,8 +43,8 @@
 		</div>
 	{:else}
 		<ul class="list">
-			{#each view.tiers as t}
-				<li>
+			{#each view.tiers as t (t.i)}
+				<li use:swappable={{ i: t.i, enabled: editing.swap, onswap: swapTiers }}>
 					<span>{t.name}</span>
 					<i></i>
 					<span>{c.currency}{t.price}</span>

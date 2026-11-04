@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { site, art, commissions as c } from './data.ts';
-	import { custom, view } from './custom.svelte.ts';
+	import { custom, view, editing, swapTiers } from './custom.svelte.ts';
+	import { swappable } from './swap.ts';
 	import Card from './Card.svelte';
 	import Pic from './Pic.svelte';
 
@@ -49,8 +50,8 @@
 		<section id="sec-{si}">
 			<h2>{s.title}</h2>
 			<div class="tiers">
-				{#each s.tiers as t}
-					<figure>
+				{#each s.tiers as t (t.i)}
+					<figure use:swappable={{ i: t.i, enabled: editing.swap, onswap: swapTiers }}>
 						<Pic
 							pic={art[t.img]}
 							url={custom.on ? custom.tierPics[t.i] : null}

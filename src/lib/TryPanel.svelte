@@ -88,7 +88,7 @@
 			drag: 'перетаскивание',
 			dragOrder: 'порядок',
 			dragCrop: 'кадр',
-			dragOrderNote: 'зажми картинку на странице работ и перетащи на другую, они поменяются местами',
+			dragOrderNote: 'зажми картинку и перетащи на другую, они поменяются местами',
 			dragCropNote: 'тяни внутри картинки, чтобы выбрать, какая часть видна',
 			resetOrder: 'сбросить порядок',
 			resetCrop: 'сбросить кадры',
@@ -96,6 +96,7 @@
 			showStatus: 'статус комиссий',
 			showRecent: 'последние работы',
 			work: 'работы',
+			gallery: 'галерея',
 			masonry: 'мозаика',
 			grid: 'сетка',
 			big: 'крупно',
@@ -188,7 +189,7 @@
 			drag: 'dragging',
 			dragOrder: 'order',
 			dragCrop: 'crop',
-			dragOrderNote: 'hold a picture on the work page and drag it onto another one to swap them',
+			dragOrderNote: 'hold a picture and drag it onto another one to swap them',
 			dragCropNote: 'drag inside a picture to choose which part is visible',
 			resetOrder: 'reset order',
 			resetCrop: 'reset crops',
@@ -196,6 +197,7 @@
 			showStatus: 'commission status',
 			showRecent: 'recent work',
 			work: 'work',
+			gallery: 'gallery',
 			masonry: 'mosaic',
 			grid: 'grid',
 			big: 'large',
@@ -237,12 +239,13 @@
 	const colorNames = { paper: 'bg', page: 'page', ink: 'text', mute: 'small', rule: 'rules', line: 'lines' } as const;
 	let colors = $derived(
 		custom.layout === 'card'
-			? (['paper', 'page', 'ink', 'mute', 'rule', 'line'] as const)
+			? (['paper', 'page', 'ink', 'mute', 'line'] as const)
 			: (['paper', 'ink', 'mute', 'rule', 'line'] as const)
 	);
 	const tabs = ['look', 'text', 'pics', 'pages', 'save'] as const;
 
 	let l = $derived(t[custom.lang]);
+	let soft = $derived(custom.layout === 'card');
 	let flash = $state('');
 
 	function changed() {
@@ -401,10 +404,12 @@
 			{#if custom.tab === 'look'}
 				<span class="label">{l.layout}</span>
 				{@render seg(['editorial', 'card'] as const, custom.layout, (v) => setc('layout', v), (v) => l[v])}
-				<label class="row">
-					<span>{l.radius}</span>
-					<input type="range" min="0" max="48" step="1" bind:value={custom.radius} oninput={changed} />
-				</label>
+				{#if soft}
+					<label class="row">
+						<span>{l.radius}</span>
+						<input type="range" min="0" max="48" step="1" bind:value={custom.radius} oninput={changed} />
+					</label>
+				{/if}
 
 				<span class="label">{l.start}</span>
 				<div class="swatches">
@@ -522,7 +527,7 @@
 				{@render seg(['order', 'crop'] as const, custom.dragMode, (v) => set('dragMode', v), (v) => l[v === 'order' ? 'dragOrder' : 'dragCrop'])}
 				<p class="note">{custom.dragMode === 'order' ? l.dragOrderNote : l.dragCropNote}</p>
 				<div class="share">
-					<button class="link" onclick={() => setc('order', [])}>{l.resetOrder}</button>
+					<button class="link" onclick={() => ((custom.order = []), setc('tierOrder', []))}>{l.resetOrder}</button>
 					<button class="link" onclick={() => setc('focus', {})}>{l.resetCrop}</button>
 				</div>
 
@@ -530,9 +535,9 @@
 				<span class="label">{l.shape}</span>
 				{@render seg(['square', 'round', 'arch'] as const, custom.avatarShape, (v) => setc('avatarShape', v), (v) => l[v])}
 
-				<span class="label">{l.workPics} / {l.comm}</span>
+				<span class="label">{soft ? l.gallery : l.workPics} / {l.comm}</span>
 				{@render file(
-					l.workPics,
+					soft ? l.gallery : l.workPics,
 					custom.workPics.length ? `${custom.workPics.length} ${l.pieces}` : '',
 					pickWork,
 					custom.workPics.length ? () => (custom.workPics = []) : null,
@@ -579,6 +584,7 @@
 					<span class="sub">{l.cardPos}</span>
 					{@render seg(['left', 'center', 'right'] as const, custom.cardPos, (v) => setc('cardPos', v), (v) => l[v])}
 				{/if}
+				{#if soft}
 				<details class="each">
 					<summary>{l.each}</summary>
 					{#each ['title', 'info', 'buttons', 'terms', 'lists', 'socials'] as const as part}
@@ -599,15 +605,18 @@
 						</div>
 					{/each}
 				</details>
+				{/if}
 				<span class="sub">{l.avatarSide}</span>
 				{@render seg(['left', 'right'] as const, custom.avatarSide, (v) => setc('avatarSide', v), (v) => l[v])}
 
 				<span class="label">{l.home} <a class="link" href={resolve('/')}>→</a></span>
 				{@render toggle(l.showTags, custom.showTags, (v) => setc('showTags', v))}
 				{@render toggle(l.showStatus, custom.showStatus, (v) => setc('showStatus', v))}
-				{@render toggle(l.showRecent, custom.showRecent, (v) => setc('showRecent', v))}
+				{#if !soft}
+					{@render toggle(l.showRecent, custom.showRecent, (v) => setc('showRecent', v))}
+				{/if}
 
-				<span class="label">{l.work} <a class="link" href={resolve('/gallery')}>→</a></span>
+				<span class="label">{soft ? l.gallery : l.work} <a class="link" href={resolve('/gallery')}>→</a></span>
 				{#if custom.layout === 'card'}
 					{@render seg(['grid', 'masonry', 'big'] as const, custom.cardGalLayout, (v) => setc('cardGalLayout', v), (v) => l[v])}
 					{#if custom.cardGalLayout !== 'big'}
@@ -626,6 +635,7 @@
 				{/if}
 
 				<span class="label">{l.comm} <a class="link" href={resolve('/commissions')}>→</a></span>
+				{#if !soft}
 				{@render seg(['pictures', 'list'] as const, custom.commLayout, (v) => setc('commLayout', v), (v) => l[v])}
 				{#if custom.commLayout === 'pictures'}
 					{@render seg(
@@ -634,6 +644,7 @@
 						(v) => setc('commShape', v),
 						(v) => l[v === 'original' ? 'asis' : v]
 					)}
+				{/if}
 				{/if}
 			{:else if custom.tab === 'save'}
 				<span class="label">{l.versions}</span>

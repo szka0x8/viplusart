@@ -32,6 +32,7 @@ export const defaults = {
 	cardGalHero: true,
 	cardGalTitles: false,
 	order: [] as number[],
+	tierOrder: [] as number[],
 	focus: {} as Record<string, [number, number]>,
 	bodyFont: 'archivo',
 	titleScale: 1,
@@ -172,10 +173,6 @@ function list(v: string, fallback: string[]) {
 		: fallback;
 }
 
-function tiersOf() {
-	return commissions.tiers.map((t) => ({ ...t, price: String(t.price) }));
-}
-
 function currentOrder(n: number) {
 	const o = (custom.on ? custom.order : []).filter((i) => i < n);
 	return [...o, ...[...Array(n).keys()].filter((i) => !o.includes(i))];
@@ -184,6 +181,23 @@ function currentOrder(n: number) {
 export function workItems(): GalleryItem[] {
 	if (custom.on && custom.workPics.length) return custom.workPics;
 	return currentOrder(gallery.length).map((i) => gallery[i]);
+}
+
+function tierOrder() {
+	const n = commissions.tiers.length;
+	const o = (custom.on ? custom.tierOrder : []).filter((i) => i < n);
+	return [...o, ...[...Array(n).keys()].filter((i) => !o.includes(i))];
+}
+
+export function swapTiers(a: number, b: number) {
+	if (a === b || commissions.tiers[a].section !== commissions.tiers[b].section) return;
+	const o = tierOrder();
+	const pa = o.indexOf(a);
+	const pb = o.indexOf(b);
+	[o[pa], o[pb]] = [o[pb], o[pa]];
+	custom.tierOrder = o;
+	custom.on = true;
+	save();
 }
 
 export function swapWork(a: number, b: number) {
@@ -248,18 +262,22 @@ export const view = {
 		return list(custom.on ? custom.text.wont : '', commissions.wont);
 	},
 	get sections() {
-		const out: { title: string; tiers: (ReturnType<typeof tiersOf>[number] & { i: number })[] }[] = [];
-		this.tiers.forEach((t, i) => {
+		const out: { title: string; tiers: ReturnType<typeof view.tiersRaw> }[] = [];
+		for (const t of this.tiers) {
 			let sec = out.find((s) => s.title === t.section);
 			if (!sec) out.push((sec = { title: t.section, tiers: [] }));
-			sec.tiers.push({ ...t, i });
-		});
+			sec.tiers.push(t);
+		}
 		return out;
 	},
-	get tiers() {
+	tiersRaw() {
 		return commissions.tiers.map((t, i) => {
 			const o = custom.on ? custom.text.tiers[i] : undefined;
-			return { ...t, name: o?.name?.trim() || t.name, price: o?.price?.trim() || t.price };
+			return { ...t, i, name: o?.name?.trim() || t.name, price: o?.price?.trim() || String(t.price) };
 		});
+	},
+	get tiers() {
+		const raw = this.tiersRaw();
+		return tierOrder().map((i) => raw[i]);
 	}
 };
