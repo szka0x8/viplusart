@@ -111,11 +111,10 @@
 	}
 
 	.cols {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 24px;
-		max-width: 520px;
-		margin: 0 var(--mr-lists, auto) 0 var(--ml-lists, auto);
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: var(--af-lists, center);
+		gap: 20px clamp(40px, 10vw, 96px);
 	}
 
 	h3 {
@@ -159,7 +158,6 @@
 	}
 
 	@media (max-width: 560px) {
-		.cols,
 		.tiers {
 			grid-template-columns: 1fr;
 		}
