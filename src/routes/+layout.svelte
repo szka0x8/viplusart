@@ -55,8 +55,8 @@
 	$effect(() => {
 		const root = document.documentElement.style;
 		const f = fontById(custom.font);
-		if (custom.on && f.load) {
-			f.load();
+		if (custom.on) {
+			f.load?.();
 			root.setProperty('--display', f.family);
 			root.setProperty('--display-weight', String(f.weight));
 			root.setProperty('--display-stretch', f.stretch);
@@ -70,8 +70,8 @@
 	$effect(() => {
 		const html = document.documentElement;
 		const b = bodyFontById(custom.bodyFont);
-		if (custom.on && b.load) {
-			b.load();
+		if (custom.on) {
+			b.load?.();
 			html.style.setProperty('--body', b.family);
 		} else html.style.removeProperty('--body');
 		if (custom.on && custom.titleScale !== 1) html.style.setProperty('--title-scale', String(custom.titleScale));
@@ -224,7 +224,7 @@
 	}
 
 	:global(h1) {
-		font-family: var(--display, inherit);
+		font-family: var(--display, 'Archivo Variable'), system-ui, sans-serif;
 		font-weight: var(--display-weight, 900);
 		font-stretch: var(--display-stretch, 125%);
 		letter-spacing: var(--display-spacing, -0.03em);
@@ -278,17 +278,7 @@
 	}
 
 	:global(.nm.fx-glow) {
-		animation: fx-glow 3s ease-in-out infinite;
-	}
-
-	@keyframes -global-fx-glow {
-		0%,
-		100% {
-			filter: drop-shadow(0 0 0.05em color-mix(in srgb, var(--fx) 55%, transparent));
-		}
-		50% {
-			filter: drop-shadow(0 0 0.12em var(--fx)) drop-shadow(0 0 0.26em color-mix(in srgb, var(--fx2) 70%, transparent));
-		}
+		filter: drop-shadow(0 0 0.1em color-mix(in srgb, var(--fx) 80%, transparent)) drop-shadow(0 0 0.24em color-mix(in srgb, var(--fx2) 55%, transparent));
 	}
 
 	:global(.nm.fx-shimmer) {
@@ -343,20 +333,6 @@
 		}
 	}
 
-	:global(.nm.fx-float) {
-		animation: fx-float 4s ease-in-out infinite;
-	}
-
-	@keyframes -global-fx-float {
-		0%,
-		100% {
-			transform: translateY(0);
-		}
-		50% {
-			transform: translateY(-0.08em);
-		}
-	}
-
 	:global(.nm.fx-outline) {
 		color: transparent;
 		-webkit-text-stroke: max(1px, 0.022em) var(--ink);
@@ -365,53 +341,6 @@
 	:global(.nm.fx-outline.grad) {
 		-webkit-text-stroke: max(1px, 0.022em) var(--n1);
 		background: none;
-	}
-
-	:global(.nm.fx-glitch::before),
-	:global(.nm.fx-glitch::after) {
-		content: attr(data-text);
-		position: absolute;
-		inset: 0;
-		pointer-events: none;
-		opacity: 0;
-		background: none;
-		-webkit-background-clip: initial;
-		background-clip: initial;
-	}
-
-	:global(.nm.fx-glitch::before) {
-		color: var(--fx);
-		animation: fx-glitch 3.2s steps(1) infinite;
-	}
-
-	:global(.nm.fx-glitch::after) {
-		color: var(--fx2);
-		animation: fx-glitch 3.2s steps(1) infinite reverse;
-	}
-
-	@keyframes -global-fx-glitch {
-		0%,
-		88%,
-		100% {
-			opacity: 0;
-			transform: none;
-			clip-path: inset(0 0 0 0);
-		}
-		90% {
-			opacity: 0.85;
-			transform: translate(-0.04em, 0.015em);
-			clip-path: inset(10% 0 55% 0);
-		}
-		93% {
-			opacity: 0.85;
-			transform: translate(0.04em, -0.015em);
-			clip-path: inset(55% 0 10% 0);
-		}
-		96% {
-			opacity: 0.85;
-			transform: translate(-0.03em, 0);
-			clip-path: inset(35% 0 35% 0);
-		}
 	}
 
 	:global(html.fx-reveal main figure),

@@ -49,7 +49,7 @@
 			effects: 'эффекты',
 			bw: 'чёрно-белые картинки',
 			nameFx: 'эффект названия',
-			fx: { none: 'нет', glow: 'свечение', shimmer: 'блеск', type: 'печать', glitch: 'глитч', float: 'парение', outline: 'контур', sparkle: 'блёстки' },
+			fx: { none: 'нет', glow: 'свечение', shimmer: 'блеск', type: 'печать', outline: 'контур', sparkle: 'блёстки' },
 			nameColor: 'цвет названия',
 			gradTip: 'градиент',
 			solid: 'обычный',
@@ -166,7 +166,7 @@
 			effects: 'effects',
 			bw: 'black & white pictures',
 			nameFx: 'name effect',
-			fx: { none: 'none', glow: 'glow', shimmer: 'shimmer', type: 'typing', glitch: 'glitch', float: 'float', outline: 'outline', sparkle: 'sparkle' },
+			fx: { none: 'none', glow: 'glow', shimmer: 'shimmer', type: 'typing', outline: 'outline', sparkle: 'sparkle' },
 			nameColor: 'name color',
 			gradTip: 'gradient',
 			solid: 'normal',
@@ -527,7 +527,7 @@
 
 				<span class="label">{l.nameFx}</span>
 				<div class="fxgrid">
-					{#each ['none', 'glow', 'shimmer', 'type', 'glitch', 'float', 'outline', 'sparkle'] as const as v}
+					{#each ['none', 'glow', 'shimmer', 'type', 'outline', 'sparkle'] as const as v}
 						<button class:on={custom.nameFx === v} onclick={() => setc('nameFx', v)}>{l.fx[v]}</button>
 					{/each}
 				</div>

@@ -39,7 +39,7 @@ export const defaults = {
 	avatarShape: 'square' as 'square' | 'round' | 'arch',
 	bw: false,
 	grain: 0,
-	nameFx: 'none' as 'none' | 'glow' | 'shimmer' | 'type' | 'glitch' | 'float' | 'outline' | 'sparkle',
+	nameFx: 'none' as 'none' | 'glow' | 'shimmer' | 'type' | 'outline' | 'sparkle',
 	fxColor: '#b98cff',
 	fxGrad: false,
 	fx2: '#ff9ad5',
@@ -110,6 +110,11 @@ export function design(): Design {
 function merge(data: Partial<Design>) {
 	const text = { ...structuredClone(defaults.text), ...(data.text ?? {}) };
 	Object.assign(custom, structuredClone(defaults), data, { text });
+	fixFx();
+}
+
+function fixFx() {
+	if (!['none', 'glow', 'shimmer', 'type', 'outline', 'sparkle'].includes(custom.nameFx)) custom.nameFx = 'none';
 }
 
 export function load() {
@@ -120,6 +125,7 @@ export function load() {
 			Object.assign(custom, rest);
 			if (text) custom.text = { ...structuredClone(defaults.text), ...text };
 			custom.grads = { ...structuredClone(defaults.grads), ...(rest.grads ?? {}) };
+			fixFx();
 		}
 	} catch {}
 }
