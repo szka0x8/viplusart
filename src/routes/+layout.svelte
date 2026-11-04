@@ -18,7 +18,7 @@
 
 	$effect(() => {
 		const root = document.documentElement.style;
-		for (const k of ['paper', 'ink', 'mute', 'line', 'rule'] as const) {
+		for (const k of ['paper', 'page', 'ink', 'mute', 'line', 'rule'] as const) {
 			if (custom.on) root.setProperty(`--${k}`, custom[k]);
 			else root.removeProperty(`--${k}`);
 		}
@@ -54,6 +54,8 @@
 		html.classList.toggle('edit-crop', editing.crop);
 		if (custom.on) html.style.setProperty('--radius', `${custom.radius}px`);
 		else html.style.removeProperty('--radius');
+		if (custom.on) html.style.setProperty('--card-alpha', `${custom.cardAlpha}%`);
+		else html.style.removeProperty('--card-alpha');
 
 		const flex = { left: 'flex-start', center: 'center', right: 'flex-end' } as const;
 		const mi = { left: ['0', 'auto'], center: ['auto', 'auto'], right: ['auto', '0'] } as const;
@@ -95,6 +97,9 @@
 		style:opacity={custom.bgOpacity}
 		style:filter={`blur(${custom.bgBlur}px)`}
 	></div>
+	{#if custom.tintAmount > 0}
+		<div class="tint" style:background={custom.tint} style:opacity={custom.tintAmount}></div>
+	{/if}
 {/if}
 
 {@render children()}
@@ -121,6 +126,7 @@
 		--mute: #77736b;
 		--line: #d3cec4;
 		--rule: var(--ink);
+		--page: var(--paper);
 		--radius: 24px;
 		--pad: clamp(16px, 4vw, 48px);
 	}
@@ -218,6 +224,17 @@
 		pointer-events: none;
 		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 		mix-blend-mode: multiply;
+	}
+
+	:global(html.card body) {
+		background: var(--page);
+	}
+
+	.tint {
+		position: fixed;
+		inset: 0;
+		z-index: -1;
+		pointer-events: none;
 	}
 
 	.bgimg {

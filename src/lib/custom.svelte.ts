@@ -3,6 +3,10 @@ import { resolve } from '$app/paths';
 
 export const defaults = {
 	paper: '#eeebe4',
+	page: '#eeebe4',
+	cardAlpha: 82,
+	tint: '#000000',
+	tintAmount: 0,
 	ink: '#151515',
 	mute: '#77736b',
 	line: '#d3cec4',

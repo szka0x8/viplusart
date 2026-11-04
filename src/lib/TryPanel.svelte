@@ -37,6 +37,11 @@
 			size: 'размер названия',
 			colors: 'цвета',
 			bg: 'фон',
+			cardBg: 'фон карточки',
+			page: 'фон вокруг карточки',
+			cardAlpha: 'плотность карточки',
+			tint: 'цвет поверх картинки',
+			tintAmount: 'сила цвета',
 			text: 'текст',
 			small: 'мелкий текст',
 			rules: 'главные линии',
@@ -132,6 +137,11 @@
 			size: 'title size',
 			colors: 'colors',
 			bg: 'background',
+			cardBg: 'card background',
+			page: 'background around the card',
+			cardAlpha: 'card opacity',
+			tint: 'color over the picture',
+			tintAmount: 'color strength',
 			text: 'text',
 			small: 'small text',
 			rules: 'main lines',
@@ -224,8 +234,12 @@
 		{ ru: 'ночь', en: 'night', paper: '#151a24', ink: '#e6e9f0', mute: '#8a93a6', line: '#2a3142' }
 	];
 
-	const colors = ['paper', 'ink', 'mute', 'rule', 'line'] as const;
-	const colorNames = { paper: 'bg', ink: 'text', mute: 'small', rule: 'rules', line: 'lines' } as const;
+	const colorNames = { paper: 'bg', page: 'page', ink: 'text', mute: 'small', rule: 'rules', line: 'lines' } as const;
+	let colors = $derived(
+		custom.layout === 'card'
+			? (['paper', 'page', 'ink', 'mute', 'rule', 'line'] as const)
+			: (['paper', 'ink', 'mute', 'rule', 'line'] as const)
+	);
 	const tabs = ['look', 'text', 'pics', 'pages', 'save'] as const;
 
 	let l = $derived(t[custom.lang]);
@@ -248,7 +262,7 @@
 
 	function apply(p: (typeof presets)[number]) {
 		const { ru, en, ...c } = p;
-		Object.assign(custom, c, { rule: c.ink });
+		Object.assign(custom, c, { rule: c.ink, page: c.paper });
 		changed();
 	}
 
@@ -402,13 +416,20 @@
 				<span class="label">{l.colors}</span>
 				{#each colors as c}
 					<div class="row">
-						<span>{l[colorNames[c]]}</span>
+						<span>{c === 'paper' && custom.layout === 'card' ? l.cardBg : l[colorNames[c]]}</span>
 						<span class="pick">
 							<input type="text" bind:value={custom[c]} oninput={changed} spellcheck="false" />
 							<ColorPick bind:value={custom[c]} onchange={changed} />
 						</span>
 					</div>
 				{/each}
+
+				{#if custom.layout === 'card'}
+					<label class="row">
+						<span>{l.cardAlpha}</span>
+						<input type="range" min="20" max="100" step="2" bind:value={custom.cardAlpha} oninput={changed} />
+					</label>
+				{/if}
 
 				<span class="label">{l.font}</span>
 				<div class="fonts">
@@ -536,6 +557,17 @@
 					<label class="row">
 						<span>{l.blur}</span>
 						<input type="range" min="0" max="30" step="1" bind:value={custom.bgBlur} oninput={changed} />
+					</label>
+					<div class="row">
+						<span>{l.tint}</span>
+						<span class="pick">
+							<input type="text" bind:value={custom.tint} oninput={changed} spellcheck="false" />
+							<ColorPick bind:value={custom.tint} onchange={changed} />
+						</span>
+					</div>
+					<label class="row">
+						<span>{l.tintAmount}</span>
+						<input type="range" min="0" max="0.9" step="0.05" bind:value={custom.tintAmount} oninput={changed} />
 					</label>
 				{/if}
 				<p class="note">{l.picsNote}</p>
