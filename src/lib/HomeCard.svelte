@@ -32,8 +32,8 @@
 					</ul>
 				{/if}
 
-				<a class="btn" href={resolve('/commissions')}>commissions</a>
-				<a class="btn" href={resolve('/gallery')}>gallery</a>
+				<a class="btn" href={resolve('/commissions')}><span>commissions</span></a>
+				<a class="btn" href={resolve('/gallery')}><span>gallery</span></a>
 
 				{#if view.o.showStatus}
 					<p class="status">commissions are <b>{commissions.open ? 'open' : 'closed'}</b></p>
@@ -132,14 +132,8 @@
 		text-align: var(--a-buttons, center);
 		padding: 10px 16px;
 		border-radius: 999px;
-		background: color-mix(in srgb, var(--ink) 10%, transparent);
 		text-decoration: none;
 		font-size: 17px;
-		transition: background 0.2s;
-	}
-
-	.btn:hover {
-		background: color-mix(in srgb, var(--ink) 18%, transparent);
 	}
 
 	.status {
@@ -173,12 +167,12 @@
 	.socials svg {
 		width: 24px;
 		height: 24px;
-		fill: var(--mute);
-		transition: fill 0.2s;
+		fill: var(--icon);
+		transition: opacity 0.2s;
 	}
 
 	.socials a:hover svg {
-		fill: var(--ink);
+		opacity: 0.65;
 	}
 
 	@media (max-width: 640px) {

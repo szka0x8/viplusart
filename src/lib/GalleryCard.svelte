@@ -13,10 +13,10 @@
 
 <Card back="top">
 	<div
-		class="grid {o.cardGalLayout}"
-		class:hero={o.cardGalHero}
-		style:--cols={o.cardGalLayout === 'big' ? 1 : o.cardGalCols}
-		style:--gap={gaps[o.workGap]}
+		class="grid {o.galLayout}"
+		class:hero={o.galHero}
+		style:--cols={o.galLayout === 'big' ? 1 : o.galCols}
+		style:--gap={gaps[o.galGap]}
 	>
 		{#each items as item, i}
 			<figure class:first={i === 0} use:swappable={{ i, enabled: editing.swap, onswap: swapWork }}>
@@ -25,10 +25,10 @@
 						{...item}
 						alt={item.title}
 						focus="g:{item.title}"
-						sizes={i === 0 && o.cardGalHero ? '(max-width: 700px) 90vw, 700px' : '(max-width: 700px) 45vw, 340px'}
+						sizes={i === 0 && o.galHero ? '(max-width: 700px) 90vw, 700px' : '(max-width: 700px) 45vw, 340px'}
 					/>
 				</button>
-				{#if o.cardGalTitles}
+				{#if o.galTitles}
 					<figcaption>{item.title}</figcaption>
 				{/if}
 			</figure>

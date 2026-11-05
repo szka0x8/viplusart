@@ -11,11 +11,13 @@
 <Card back="bottom">
 	<p class="status">commission status: <b>{c.open ? 'open' : 'closed'}</b></p>
 
+	{#if view.o.commJump}
 	<nav class="jump">
 		{#each view.sections as s, i}
-			<a class="pill" href="#sec-{i}">{s.title} ›</a>
+			<a class="pill" href="#sec-{i}"><span>{s.title} ›</span></a>
 		{/each}
 	</nav>
+	{/if}
 
 	<hr class="sep" />
 
@@ -49,7 +51,7 @@
 		<hr class="sep" />
 		<section id="sec-{si}">
 			<h2>{s.title}</h2>
-			<div class="tiers">
+			<div class="tiers {view.o.commShape}" style:--cc={view.o.commCols}>
 				{#each s.tiers as t (t.i)}
 					<figure use:swappable={{ i: t.i, enabled: editing.swap, onswap: swapTiers }}>
 						<Pic
@@ -136,8 +138,9 @@
 
 	.tiers {
 		display: grid;
-		grid-template-columns: 1fr 1fr;
+		grid-template-columns: repeat(var(--cc, 2), 1fr);
 		gap: 14px;
+		align-items: start;
 	}
 
 	figure {
@@ -146,9 +149,16 @@
 
 	figure :global(img) {
 		width: 100%;
-		aspect-ratio: 4 / 5;
 		object-fit: cover;
 		border-radius: calc(var(--radius) * 0.7);
+	}
+
+	.portrait :global(img) {
+		aspect-ratio: 4 / 5;
+	}
+
+	.square :global(img) {
+		aspect-ratio: 1;
 	}
 
 	figcaption {
@@ -159,7 +169,7 @@
 
 	@media (max-width: 560px) {
 		.tiers {
-			grid-template-columns: 1fr;
+			grid-template-columns: repeat(min(var(--cc, 2), 2), 1fr);
 		}
 	}
 </style>

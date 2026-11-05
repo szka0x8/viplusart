@@ -12,7 +12,7 @@
 	];
 </script>
 
-<span class="nm fx-{view.o.nameFx}" class:grad={view.o.nameGrad} data-text={view.name}
+<span class="nm fx-{view.o.nameFx}" class:grad={view.o.grads.name.on} data-text={view.name}
 	>{view.name}{#if view.o.nameFx === 'sparkle'}<span class="sparks" aria-hidden="true"
 			>{#each spots as p, i}<i
 					class:alt={i % 2 === 1}

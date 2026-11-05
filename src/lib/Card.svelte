@@ -8,11 +8,11 @@
 <main>
 	<div class="card">
 		{#if back === 'top'}
-			<a class="back top" href={resolve('/')}>‹ back</a>
+			<a class="back top" href={resolve('/')}><span>‹ back</span></a>
 		{/if}
 		{@render children()}
 		{#if back === 'bottom'}
-			<a class="back" href={resolve('/')}>‹ back</a>
+			<a class="back" href={resolve('/')}><span>‹ back</span></a>
 		{/if}
 	</div>
 </main>
@@ -44,7 +44,6 @@
 		margin-top: 28px;
 		padding: 8px 20px;
 		border-radius: 999px;
-		background: color-mix(in srgb, var(--ink) 10%, transparent);
 		text-decoration: none;
 	}
 
@@ -52,21 +51,11 @@
 		margin: 0 0 20px;
 	}
 
-	.back:hover {
-		background: color-mix(in srgb, var(--ink) 18%, transparent);
-	}
-
 	.card :global(.pill) {
 		display: inline-block;
 		padding: 8px 20px;
 		border-radius: 999px;
-		background: color-mix(in srgb, var(--ink) 10%, transparent);
 		text-decoration: none;
-		transition: background 0.2s;
-	}
-
-	.card :global(.pill:hover) {
-		background: color-mix(in srgb, var(--ink) 18%, transparent);
 	}
 
 	.card :global(.sep) {

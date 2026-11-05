@@ -10,7 +10,10 @@
 		loadSlots,
 		saveSlot,
 		loadSlot,
-		shareLink
+		shareLink,
+		gradKeys,
+		type ColorKey,
+		type GradKey
 	} from './custom.svelte.ts';
 	import { fonts, fontById, bodyFonts, bodyFontById } from './fonts.ts';
 	import ColorPick from './ColorPick.svelte';
@@ -25,11 +28,23 @@
 	const t = {
 		ru: {
 			title: 'настройки',
+			basics: 'основа',
+			fonts: 'шрифты',
+			cardSec: 'карточка',
+			textSec: 'текст',
+			btnSec: 'кнопки и иконки',
+			nameC: 'название',
+			btn: 'кнопки',
+			btntext: 'текст кнопок',
+			icon: 'иконки соцсетей',
+			fxColor: 'цвет эффекта',
+			pColor: 'цвет частиц',
+			perRow: 'в ряд',
+			picShape: 'форма картинок',
+			showJump: 'кнопки разделов',
+			fxNote: 'градиент тут = два цвета по очереди',
 			note: 'это видишь только ты',
 			tabs: { look: 'вид', text: 'текст', pics: 'картинки', pages: 'страницы', save: 'сохранить' },
-			layout: 'макет',
-			editorial: 'строгий',
-			card: 'мягкий',
 			radius: 'скругление',
 			start: 'начать с',
 			font: 'шрифт названия',
@@ -44,7 +59,6 @@
 			tintAmount: 'сила цвета',
 			text: 'текст',
 			small: 'мелкий текст',
-			rules: 'главные линии',
 			lines: 'тонкие линии',
 			effects: 'эффекты',
 			bw: 'чёрно-белые картинки',
@@ -55,10 +69,8 @@
 			solid: 'обычный',
 			gradient: 'градиент',
 			angle: 'угол',
-			fxGrad: 'градиент эффектов',
 			color1: 'цвет 1',
 			color2: 'цвет 2',
-			fxColor: 'цвет эффектов',
 			reveal: 'появление при прокрутке',
 			lift: 'подъём при наведении',
 			pageFade: 'плавные переходы',
@@ -79,7 +91,6 @@
 			square: 'квадрат',
 			round: 'круг',
 			arch: 'арка',
-			workPics: 'работы',
 			pieces: 'шт.',
 			comm: 'комиссии',
 			bgPic: 'картинка на фон',
@@ -110,8 +121,6 @@
 			resetCrop: 'сбросить кадры',
 			showTags: 'о тебе',
 			showStatus: 'статус комиссий',
-			showRecent: 'последние работы',
-			work: 'работы',
 			gallery: 'галерея',
 			masonry: 'мозаика',
 			grid: 'сетка',
@@ -121,8 +130,6 @@
 			normal: 'обычно',
 			wide: 'широко',
 			titles: 'подписи',
-			pictures: 'с картинками',
-			list: 'списком',
 			portrait: 'высокие',
 			asis: 'как есть',
 			yes: 'да',
@@ -142,11 +149,23 @@
 		},
 		en: {
 			title: 'settings',
+			basics: 'basics',
+			fonts: 'fonts',
+			cardSec: 'card',
+			textSec: 'text',
+			btnSec: 'buttons & icons',
+			nameC: 'name',
+			btn: 'buttons',
+			btntext: 'button text',
+			icon: 'social icons',
+			fxColor: 'effect color',
+			pColor: 'particle color',
+			perRow: 'per row',
+			picShape: 'picture shape',
+			showJump: 'section buttons',
+			fxNote: 'gradient here = two colors taking turns',
 			note: 'only you see this',
 			tabs: { look: 'look', text: 'text', pics: 'pictures', pages: 'pages', save: 'save' },
-			layout: 'layout',
-			editorial: 'clean',
-			card: 'soft',
 			radius: 'roundness',
 			start: 'start from',
 			font: 'title font',
@@ -161,7 +180,6 @@
 			tintAmount: 'color strength',
 			text: 'text',
 			small: 'small text',
-			rules: 'main lines',
 			lines: 'thin lines',
 			effects: 'effects',
 			bw: 'black & white pictures',
@@ -172,10 +190,8 @@
 			solid: 'normal',
 			gradient: 'gradient',
 			angle: 'angle',
-			fxGrad: 'effect gradient',
 			color1: 'color 1',
 			color2: 'color 2',
-			fxColor: 'effect color',
 			reveal: 'fade in on scroll',
 			lift: 'lift on hover',
 			pageFade: 'smooth page change',
@@ -196,7 +212,6 @@
 			square: 'square',
 			round: 'round',
 			arch: 'arch',
-			workPics: 'work',
 			pieces: 'pcs',
 			comm: 'commissions',
 			bgPic: 'background picture',
@@ -227,8 +242,6 @@
 			resetCrop: 'reset crops',
 			showTags: 'about you',
 			showStatus: 'commission status',
-			showRecent: 'recent work',
-			work: 'work',
 			gallery: 'gallery',
 			masonry: 'mosaic',
 			grid: 'grid',
@@ -238,8 +251,6 @@
 			normal: 'normal',
 			wide: 'wide',
 			titles: 'titles',
-			pictures: 'with pictures',
-			list: 'as a list',
 			portrait: 'tall',
 			asis: 'as is',
 			yes: 'on',
@@ -268,16 +279,14 @@
 		{ ru: 'ночь', en: 'night', paper: '#151a24', ink: '#e6e9f0', mute: '#8a93a6', line: '#2a3142' }
 	];
 
-	const colorNames = { paper: 'bg', page: 'page', ink: 'text', mute: 'small', rule: 'rules', line: 'lines' } as const;
-	let colors = $derived(
-		custom.layout === 'card'
-			? (['paper', 'page', 'ink', 'mute', 'line'] as const)
-			: (['paper', 'ink', 'mute', 'rule', 'line'] as const)
-	);
+	function mix(a: string, b: string, t: number) {
+		const p = (h: string, i: number) => parseInt(h.slice(1 + i * 2, 3 + i * 2), 16);
+		return '#' + [0, 1, 2].map((i) => Math.round(p(a, i) + (p(b, i) - p(a, i)) * t).toString(16).padStart(2, '0')).join('');
+	}
+
 	const tabs = ['look', 'text', 'pics', 'pages', 'save'] as const;
 
 	let l = $derived(t[custom.lang]);
-	let soft = $derived(custom.layout === 'card');
 	let flash = $state('');
 
 	function changed() {
@@ -297,7 +306,13 @@
 
 	function apply(p: (typeof presets)[number]) {
 		const { ru, en, ...c } = p;
-		Object.assign(custom, c, { rule: c.ink, page: c.paper });
+		Object.assign(custom, c, {
+			page: c.paper,
+			name: c.ink,
+			btn: mix(c.paper, c.ink, 0.1),
+			btntext: c.ink,
+			icon: c.mute
+		});
 		changed();
 	}
 
@@ -391,36 +406,43 @@
 	</div>
 {/snippet}
 
-{#snippet colorRow(k: 'paper' | 'page' | 'ink' | 'mute' | 'rule' | 'line' | 'tint', label: string)}
+{#snippet colorRow(k: ColorKey, label: string, angle = true)}
+	{@const g = (gradKeys as readonly string[]).includes(k) ? custom.grads[k as GradKey] : null}
 	<div class="row">
 		<span>{label}</span>
 		<span class="pick">
 			<input type="text" bind:value={custom[k]} oninput={changed} spellcheck="false" />
 			<ColorPick bind:value={custom[k]} onchange={changed} />
-			<button
-				class="gbtn"
-				class:on={custom.grads[k].on}
-				title={l.gradTip}
-				onclick={() => {
-					custom.grads[k].on = !custom.grads[k].on;
-					changed();
-				}}>⇄</button
-			>
+			{#if g}
+				<button
+					class="gbtn"
+					class:on={g.on}
+					title={l.gradTip}
+					onclick={() => {
+						g.on = !g.on;
+						changed();
+					}}>⇄</button
+				>
+			{:else}
+				<span class="gpad"></span>
+			{/if}
 		</span>
 	</div>
-	{#if custom.grads[k].on}
+	{#if g?.on}
 		<div class="row sub2">
 			<span>↳ {l.color2}</span>
 			<span class="pick">
-				<input type="text" bind:value={custom.grads[k].c2} oninput={changed} spellcheck="false" />
-				<ColorPick bind:value={custom.grads[k].c2} onchange={changed} />
+				<input type="text" bind:value={g.c2} oninput={changed} spellcheck="false" />
+				<ColorPick bind:value={g.c2} onchange={changed} />
 				<span class="gpad"></span>
 			</span>
 		</div>
-		<label class="row sub2">
-			<span>↳ {l.angle}</span>
-			<input type="range" min="0" max="360" step="5" bind:value={custom.grads[k].angle} oninput={changed} />
-		</label>
+		{#if angle}
+			<label class="row sub2">
+				<span>↳ {l.angle}</span>
+				<input type="range" min="0" max="360" step="5" bind:value={g.angle} oninput={changed} />
+			</label>
+		{/if}
 	{/if}
 {/snippet}
 
@@ -467,34 +489,37 @@
 
 		<div class="body">
 			{#if custom.tab === 'look'}
-				<span class="label">{l.layout}</span>
-				{@render seg(['editorial', 'card'] as const, custom.layout, (v) => setc('layout', v), (v) => l[v])}
-				{#if soft}
-					<label class="row">
-						<span>{l.radius}</span>
-						<input type="range" min="0" max="48" step="1" bind:value={custom.radius} oninput={changed} />
-					</label>
-				{/if}
-
+				<h4>{l.basics}</h4>
 				<span class="label">{l.start}</span>
 				<div class="swatches">
 					{#each presets as p}
 						<button title={p[custom.lang]} style:background={p.paper} style:color={p.ink} onclick={() => apply(p)}>Aa</button>
 					{/each}
 				</div>
+				<label class="row">
+					<span>{l.radius}</span>
+					<input type="range" min="0" max="48" step="1" bind:value={custom.radius} oninput={changed} />
+				</label>
+				<label class="row">
+					<span>{l.cardAlpha}</span>
+					<input type="range" min="20" max="100" step="2" bind:value={custom.cardAlpha} oninput={changed} />
+				</label>
 
-				<span class="label">{l.colors}</span>
-				{#each colors as c}
-					{@render colorRow(c, c === 'paper' && custom.layout === 'card' ? l.cardBg : l[colorNames[c]])}
-				{/each}
+				<h4>{l.colors}</h4>
+				<span class="label">{l.cardSec}</span>
+				{@render colorRow('paper', l.cardBg)}
+				{@render colorRow('page', l.page)}
+				{@render colorRow('line', l.lines)}
+				<span class="label">{l.textSec}</span>
+				{@render colorRow('name', l.nameC)}
+				{@render colorRow('ink', l.text)}
+				{@render colorRow('mute', l.small)}
+				<span class="label">{l.btnSec}</span>
+				{@render colorRow('btn', l.btn)}
+				{@render colorRow('btntext', l.btntext)}
+				{@render colorRow('icon', l.icon)}
 
-				{#if custom.layout === 'card'}
-					<label class="row">
-						<span>{l.cardAlpha}</span>
-						<input type="range" min="20" max="100" step="2" bind:value={custom.cardAlpha} oninput={changed} />
-					</label>
-				{/if}
-
+				<h4>{l.fonts}</h4>
 				<span class="label">{l.font}</span>
 				<div class="fonts">
 					{#each fonts as f}
@@ -512,7 +537,6 @@
 					<span>{l.size}</span>
 					<input type="range" min="0.4" max="1.8" step="0.05" bind:value={custom.titleScale} oninput={changed} />
 				</label>
-
 				<span class="label">{l.bodyFont}</span>
 				<div class="fonts">
 					{#each bodyFonts as f}
@@ -525,64 +549,31 @@
 					{/each}
 				</div>
 
-				<span class="label">{l.nameFx}</span>
+				<h4>{l.nameFx}</h4>
 				<div class="fxgrid">
 					{#each ['none', 'glow', 'shimmer', 'type', 'outline', 'sparkle'] as const as v}
 						<button class:on={custom.nameFx === v} onclick={() => setc('nameFx', v)}>{l.fx[v]}</button>
 					{/each}
 				</div>
-				<div class="row">
-					<span>{custom.fxGrad ? `${l.fxColor} 1` : l.fxColor}</span>
-					<span class="pick">
-						<input type="text" bind:value={custom.fxColor} oninput={changed} spellcheck="false" />
-						<ColorPick bind:value={custom.fxColor} onchange={changed} />
-					</span>
-				</div>
-				{@render toggle(l.fxGrad, custom.fxGrad, (v) => setc('fxGrad', v))}
-				{#if custom.fxGrad}
-					<div class="row">
-						<span>{l.fxColor} 2</span>
-						<span class="pick">
-							<input type="text" bind:value={custom.fx2} oninput={changed} spellcheck="false" />
-							<ColorPick bind:value={custom.fx2} onchange={changed} />
-						</span>
-					</div>
+				{#if custom.nameFx === 'glow' || custom.nameFx === 'shimmer' || custom.nameFx === 'sparkle'}
+					{@render colorRow('fx', l.fxColor, false)}
+					{#if custom.grads.fx.on}<p class="note">{l.fxNote}</p>{/if}
 				{/if}
 
-				<span class="label">{l.nameColor}</span>
-				{@render seg([false, true] as const, custom.nameGrad, (v) => setc('nameGrad', v), (v) => (v ? l.gradient : l.solid))}
-				{#if custom.nameGrad}
-					<div class="row">
-						<span>{l.color1}</span>
-						<span class="pick">
-							<input type="text" bind:value={custom.n1} oninput={changed} spellcheck="false" />
-							<ColorPick bind:value={custom.n1} onchange={changed} />
-						</span>
-					</div>
-					<div class="row">
-						<span>{l.color2}</span>
-						<span class="pick">
-							<input type="text" bind:value={custom.n2} oninput={changed} spellcheck="false" />
-							<ColorPick bind:value={custom.n2} onchange={changed} />
-						</span>
-					</div>
-					<label class="row">
-						<span>{l.angle}</span>
-						<input type="range" min="0" max="360" step="5" bind:value={custom.nameAngle} oninput={changed} />
-					</label>
-				{/if}
-
-				<span class="label">{l.effects}</span>
+				<h4>{l.effects}</h4>
 				{@render toggle(l.reveal, custom.reveal, (v) => setc('reveal', v))}
 				{@render toggle(l.lift, custom.lift, (v) => setc('lift', v))}
 				{@render toggle(l.pageFade, custom.pageFade, (v) => setc('pageFade', v))}
-				<span class="sub">{l.particles}</span>
-				{@render seg(['none', 'dust', 'stars', 'petals'] as const, custom.particles, (v) => setc('particles', v), (v) => l.parts2[v])}
 				{@render toggle(l.bw, custom.bw, (v) => setc('bw', v))}
 				<label class="row">
 					<span>{l.grain}</span>
 					<input type="range" min="0" max="0.5" step="0.02" bind:value={custom.grain} oninput={changed} />
 				</label>
+				<span class="label">{l.particles}</span>
+				{@render seg(['none', 'dust', 'stars', 'petals'] as const, custom.particles, (v) => setc('particles', v), (v) => l.parts2[v])}
+				{#if custom.particles !== 'none'}
+					{@render colorRow('pcolor', l.pColor, false)}
+				{/if}
 			{:else if custom.tab === 'text'}
 				<label class="field">
 					<span>{l.name}</span>
@@ -634,7 +625,7 @@
 					<input type="text" bind:value={custom.text.wont} oninput={changed} placeholder={commissions.wont.join(', ')} />
 				</label>
 			{:else if custom.tab === 'pics'}
-				<span class="label">{l.drag}</span>
+				<h4>{l.drag}</h4>
 				{@render seg(['order', 'crop'] as const, custom.dragMode, (v) => set('dragMode', v), (v) => l[v === 'order' ? 'dragOrder' : 'dragCrop'])}
 				<p class="note">{custom.dragMode === 'order' ? l.dragOrderNote : l.dragCropNote}</p>
 				<div class="share">
@@ -642,13 +633,12 @@
 					<button class="link" onclick={() => setc('focus', {})}>{l.resetCrop}</button>
 				</div>
 
+				<h4>{l.avatar}</h4>
 				{@render file(l.avatar, custom.avatarUrl ? '✓' : '', pickAvatar, custom.avatarUrl ? () => (custom.avatarUrl = null) : null)}
-				<span class="label">{l.shape}</span>
-				{@render seg(['square', 'round', 'arch'] as const, custom.avatarShape, (v) => setc('avatarShape', v), (v) => l[v])}
 
-				<span class="label">{soft ? l.gallery : l.workPics} / {l.comm}</span>
+				<h4>{l.gallery} / {l.comm}</h4>
 				{@render file(
-					soft ? l.gallery : l.workPics,
+					l.gallery,
 					custom.workPics.length ? `${custom.workPics.length} ${l.pieces}` : '',
 					pickWork,
 					custom.workPics.length ? () => (custom.workPics = []) : null,
@@ -663,7 +653,7 @@
 					)}
 				{/each}
 
-				<span class="label">{l.bgPic}</span>
+				<h4>{l.bgPic}</h4>
 				{@render file(l.bgPic, custom.bgName, pickBg, custom.bg ? () => ((custom.bg = null), (custom.bgName = '')) : null)}
 				{#if custom.bg}
 					<label class="row">
@@ -682,14 +672,9 @@
 				{/if}
 				<p class="note">{l.picsNote}</p>
 			{:else if custom.tab === 'pages'}
-				<span class="label">{l.alignment}</span>
-				<span class="sub">{l.textAlign}</span>
+				<h4>{l.alignment}</h4>
+				<span class="label">{l.textAlign}</span>
 				{@render seg(['auto', 'left', 'center', 'right'] as const, custom.align, (v) => setc('align', v), (v) => l[v])}
-				{#if custom.layout === 'card'}
-					<span class="sub">{l.cardPos}</span>
-					{@render seg(['left', 'center', 'right'] as const, custom.cardPos, (v) => setc('cardPos', v), (v) => l[v])}
-				{/if}
-				{#if soft}
 				<details class="each">
 					<summary>{l.each}</summary>
 					{#each ['title', 'info', 'buttons', 'terms', 'lists', 'socials'] as const as part}
@@ -710,47 +695,32 @@
 						</div>
 					{/each}
 				</details>
-				{/if}
-				<span class="sub">{l.avatarSide}</span>
-				{@render seg(['left', 'right'] as const, custom.avatarSide, (v) => setc('avatarSide', v), (v) => l[v])}
+				<span class="label">{l.cardPos}</span>
+				{@render seg(['left', 'center', 'right'] as const, custom.cardPos, (v) => setc('cardPos', v), (v) => l[v])}
 
-				<span class="label">{l.home} <a class="link" href={resolve('/')}>→</a></span>
+				<h4>{l.home} <a class="link" href={resolve('/')}>→</a></h4>
+				<span class="label">{l.avatarSide}</span>
+				{@render seg(['left', 'right'] as const, custom.avatarSide, (v) => setc('avatarSide', v), (v) => l[v])}
+				<span class="label">{l.shape}</span>
+				{@render seg(['square', 'round', 'arch'] as const, custom.avatarShape, (v) => setc('avatarShape', v), (v) => l[v])}
 				{@render toggle(l.showTags, custom.showTags, (v) => setc('showTags', v))}
 				{@render toggle(l.showStatus, custom.showStatus, (v) => setc('showStatus', v))}
-				{#if !soft}
-					{@render toggle(l.showRecent, custom.showRecent, (v) => setc('showRecent', v))}
-				{/if}
 
-				<span class="label">{soft ? l.gallery : l.work} <a class="link" href={resolve('/gallery')}>→</a></span>
-				{#if custom.layout === 'card'}
-					{@render seg(['grid', 'masonry', 'big'] as const, custom.cardGalLayout, (v) => setc('cardGalLayout', v), (v) => l[v])}
-					{#if custom.cardGalLayout !== 'big'}
-						{@render seg([2, 3, 4] as const, custom.cardGalCols, (v) => setc('cardGalCols', v), (v) => `${v} ${l.cols}`)}
-					{/if}
-					{@render seg(['tight', 'normal', 'wide'] as const, custom.workGap, (v) => setc('workGap', v), (v) => l[v])}
-					{@render toggle(l.hero, custom.cardGalHero, (v) => setc('cardGalHero', v))}
-					{@render toggle(l.titles, custom.cardGalTitles, (v) => setc('cardGalTitles', v))}
-				{:else}
-					{@render seg(['masonry', 'grid', 'big'] as const, custom.workLayout, (v) => setc('workLayout', v), (v) => l[v])}
-					{#if custom.workLayout !== 'big'}
-						{@render seg([2, 3, 4] as const, custom.workCols, (v) => setc('workCols', v), (v) => `${v} ${l.cols}`)}
-					{/if}
-					{@render seg(['tight', 'normal', 'wide'] as const, custom.workGap, (v) => setc('workGap', v), (v) => l[v])}
-					{@render toggle(l.titles, custom.workTitles, (v) => setc('workTitles', v))}
+				<h4>{l.gallery} <a class="link" href={resolve('/gallery')}>→</a></h4>
+				{@render seg(['grid', 'masonry', 'big'] as const, custom.galLayout, (v) => setc('galLayout', v), (v) => l[v])}
+				{#if custom.galLayout !== 'big'}
+					{@render seg([2, 3, 4] as const, custom.galCols, (v) => setc('galCols', v), (v) => `${v} ${l.cols}`)}
 				{/if}
+				{@render seg(['tight', 'normal', 'wide'] as const, custom.galGap, (v) => setc('galGap', v), (v) => l[v])}
+				{@render toggle(l.hero, custom.galHero, (v) => setc('galHero', v))}
+				{@render toggle(l.titles, custom.galTitles, (v) => setc('galTitles', v))}
 
-				<span class="label">{l.comm} <a class="link" href={resolve('/commissions')}>→</a></span>
-				{#if !soft}
-				{@render seg(['pictures', 'list'] as const, custom.commLayout, (v) => setc('commLayout', v), (v) => l[v])}
-				{#if custom.commLayout === 'pictures'}
-					{@render seg(
-						['portrait', 'square', 'original'] as const,
-						custom.commShape,
-						(v) => setc('commShape', v),
-						(v) => l[v === 'original' ? 'asis' : v]
-					)}
-				{/if}
-				{/if}
+				<h4>{l.comm} <a class="link" href={resolve('/commissions')}>→</a></h4>
+				<span class="label">{l.picShape}</span>
+				{@render seg(['portrait', 'square', 'original'] as const, custom.commShape, (v) => setc('commShape', v), (v) => l[v === 'original' ? 'asis' : v])}
+				<span class="label">{l.perRow}</span>
+				{@render seg([1, 2, 3] as const, custom.commCols, (v) => setc('commCols', v), (v) => String(v))}
+				{@render toggle(l.showJump, custom.commJump, (v) => setc('commJump', v))}
 			{:else if custom.tab === 'save'}
 				<span class="label">{l.versions}</span>
 				{#each ['A', 'B', 'C'] as const as k}
@@ -872,14 +842,32 @@
 		min-height: 0;
 	}
 
+	h4 {
+		font-size: 11px;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		color: #111;
+		margin: 18px 0 4px;
+		padding-top: 10px;
+		border-top: 1px solid #eee;
+	}
+
+	h4:first-child {
+		margin-top: 6px;
+		padding-top: 0;
+		border-top: none;
+	}
+
+	h4 a {
+		margin-left: 4px;
+		text-transform: none;
+	}
+
 	.label {
 		display: block;
 		color: #888;
-		margin: 12px 0 6px;
-	}
-
-	.label a {
-		margin-left: 4px;
+		margin: 10px 0 5px;
 	}
 
 	.swatches {
@@ -1083,13 +1071,6 @@
 		border-color: #111;
 		background: #f2f2f2;
 		font-weight: 700;
-	}
-
-	.sub {
-		display: block;
-		font-size: 12px;
-		color: #aaa;
-		margin: 4px 0 3px;
 	}
 
 	.sec {

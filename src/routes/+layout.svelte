@@ -4,17 +4,12 @@
 	import { onMount } from 'svelte';
 	import { onNavigate } from '$app/navigation';
 	import Particles from '#lib/Particles.svelte';
-	import { page } from '$app/state';
-	import { resolve } from '$app/paths';
-	import { site } from '#lib/data.ts';
-	import { custom, load, view, editing } from '#lib/custom.svelte.ts';
+	import { custom, load, view, editing, colorKeys, gradKeys } from '#lib/custom.svelte.ts';
 	import TryPanel from '#lib/TryPanel.svelte';
 	import { fontById, bodyFontById } from '#lib/fonts.ts';
 	import type { LayoutProps } from './$types';
 
 	let { children }: LayoutProps = $props();
-
-	let bare = $derived(view.o.layout === 'card' && page.route.id !== '/try');
 
 	let grainUrl = $state('');
 
@@ -46,7 +41,7 @@
 
 	$effect(() => {
 		const root = document.documentElement.style;
-		for (const k of ['paper', 'page', 'ink', 'mute', 'line', 'rule'] as const) {
+		for (const k of colorKeys) {
 			if (custom.on) root.setProperty(`--${k}`, custom[k]);
 			else root.removeProperty(`--${k}`);
 		}
@@ -77,7 +72,7 @@
 		if (custom.on && custom.titleScale !== 1) html.style.setProperty('--title-scale', String(custom.titleScale));
 		else html.style.removeProperty('--title-scale');
 		html.classList.toggle('bw', custom.on && custom.bw);
-		for (const k of ['paper', 'page', 'ink', 'mute', 'rule', 'line', 'tint'] as const) {
+		for (const k of gradKeys) {
 			const g = custom.grads?.[k];
 			const on = custom.on && !!g?.on;
 			if (on) {
@@ -87,21 +82,11 @@
 				html.style.removeProperty(`--${k}2`);
 				html.style.removeProperty(`--${k}-angle`);
 			}
-			if (k === 'ink' || k === 'mute' || k === 'rule' || k === 'line') html.classList.toggle(`g-${k}`, on);
+			if (k === 'ink' || k === 'mute' || k === 'line' || k === 'btntext') html.classList.toggle(`g-${k}`, on);
 		}
-		if (custom.on) html.style.setProperty('--tint', custom.tint);
-		else html.style.removeProperty('--tint');
-		html.classList.toggle('card', view.o.layout === 'card');
 		html.classList.toggle('edit-swap', editing.swap);
 		html.classList.toggle('fx-reveal', view.o.reveal);
 		html.classList.toggle('fx-lift', view.o.lift);
-		if (custom.on) {
-			html.style.setProperty('--fx', custom.fxColor);
-			html.style.setProperty('--fx2', custom.fxGrad ? custom.fx2 : custom.fxColor);
-			html.style.setProperty('--n1', custom.n1);
-			html.style.setProperty('--n2', custom.n2);
-			html.style.setProperty('--name-angle', `${custom.nameAngle}deg`);
-		} else for (const k of ['fx', 'fx2', 'n1', 'n2', 'name-angle']) html.style.removeProperty(`--${k}`);
 		html.classList.toggle('edit-crop', editing.crop);
 		if (custom.on) html.style.setProperty('--radius', `${custom.radius}px`);
 		else html.style.removeProperty('--radius');
@@ -130,17 +115,6 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-{#if !bare}
-<header>
-	<a class="home" href={resolve('/')}>{view.name}</a>
-	<nav>
-		<a href={resolve('/gallery')} class:on={page.route.id === '/gallery'}>work</a>
-		<a href={resolve('/commissions')} class:on={page.route.id === '/commissions'}>commissions</a>
-		<a href="mailto:{site.email}">contact</a>
-	</nav>
-</header>
-{/if}
-
 {#if custom.on && custom.bg}
 	<div
 		class="bgimg"
@@ -160,42 +134,40 @@
 {/if}
 
 {#if view.o.particles !== 'none'}
-	<Particles kind={view.o.particles} color={view.o.fxColor} color2={view.o.fxGrad ? view.o.fx2 : view.o.fxColor} />
+	<Particles kind={view.o.particles} color={view.o.pcolor} color2={view.o.grads.pcolor.on ? view.o.grads.pcolor.c2 : view.o.pcolor} />
 {/if}
 
 {#if custom.panel}
 	<TryPanel />
 {/if}
 
-{#if !bare}
-<footer>
-	<span>© {new Date().getFullYear()} {view.name.toLowerCase()}</span>
-	<span>all art is mine, don't repost or use for ai</span>
-</footer>
-{/if}
-
 <style>
 	:global(:root) {
 		--paper: #eeebe4;
+		--page: #eeebe4;
 		--ink: #151515;
 		--mute: #77736b;
 		--line: #d3cec4;
-		--rule: var(--ink);
-		--page: var(--paper);
+		--name: var(--ink);
+		--btn: #dcd8d0;
+		--btntext: var(--ink);
+		--icon: var(--mute);
+		--fx: #b98cff;
+		--pcolor: var(--fx);
 		--tint: #000000;
 		--paper2: var(--paper);
 		--page2: var(--page);
 		--ink2: var(--ink);
 		--mute2: var(--mute);
-		--rule2: var(--rule);
 		--line2: var(--line);
-		--tint2: var(--tint);
-		--fx: #b98cff;
+		--name2: var(--name);
+		--btn2: var(--btn);
+		--btntext2: var(--btntext);
 		--fx2: var(--fx);
+		--tint2: var(--tint);
 		--radius: 24px;
 		--pad: clamp(16px, 4vw, 48px);
 	}
-
 
 	:global(*) {
 		box-sizing: border-box;
@@ -203,7 +175,7 @@
 	}
 
 	:global(body) {
-		background: linear-gradient(var(--paper-angle, 135deg), var(--paper), var(--paper2));
+		background: linear-gradient(var(--page-angle, 135deg), var(--page), var(--page2));
 		color: var(--ink);
 		font-family: var(--body, 'Archivo Variable'), system-ui, sans-serif;
 		font-size: 15px;
@@ -248,30 +220,47 @@
 		color: var(--paper);
 	}
 
-	:global(html.g-ink :where(main, header) :where(p, li, h2, h3, dt, dd, a:not(.btn, .pill, .back))) {
+	:global(html.g-ink main :where(p, li, h2, h3, dt, dd, a:not(.btn, .pill, .back))) {
 		background: linear-gradient(var(--ink-angle, 90deg), var(--ink), var(--ink2));
 		-webkit-background-clip: text;
 		background-clip: text;
 		color: transparent !important;
 	}
 
-	:global(html:is(.g-ink, .g-mute) :is(footer span, .status, .mail span, figcaption, .payment, .head span)) {
+	:global(html:is(.g-ink, .g-mute) main :is(.status, .mail span, figcaption, .payment)) {
 		background: linear-gradient(var(--mute-angle, 90deg), var(--mute), var(--mute2));
 		-webkit-background-clip: text;
 		background-clip: text;
 		color: transparent !important;
 	}
 
-	:global(html.g-rule :is(header, .links, .recent .head, .tiers, .list)) {
-		border-image: linear-gradient(var(--rule-angle, 90deg), var(--rule), var(--rule2)) 1;
-	}
-
-	:global(html.g-line :is(.links a, .list li, footer, hr.sep)) {
+	:global(html.g-line hr.sep) {
 		border-image: linear-gradient(var(--line-angle, 90deg), var(--line), var(--line2)) 1;
 	}
 
+	:global(:is(.btn, .pill, .back)) {
+		background: linear-gradient(var(--btn-angle, 90deg), var(--btn), var(--btn2));
+		color: var(--btntext);
+		transition: filter 0.2s;
+	}
+
+	:global(:is(.btn, .pill, .back):hover) {
+		filter: brightness(0.94);
+	}
+
+	:global(html.g-btntext :is(.btn, .pill, .back) > span) {
+		background: linear-gradient(var(--btntext-angle, 90deg), var(--btntext), var(--btntext2));
+		-webkit-background-clip: text;
+		background-clip: text;
+		color: transparent;
+	}
+
+	:global(.nm) {
+		color: var(--name);
+	}
+
 	:global(.nm.grad) {
-		background: linear-gradient(var(--name-angle, 90deg), var(--n1), var(--n2));
+		background: linear-gradient(var(--name-angle, 90deg), var(--name), var(--name2));
 		-webkit-background-clip: text;
 		background-clip: text;
 		color: transparent;
@@ -282,7 +271,7 @@
 	}
 
 	:global(.nm.fx-shimmer) {
-		background: linear-gradient(100deg, var(--ink) 38%, var(--fx) 47%, var(--fx2) 53%, var(--ink) 62%) 0 0 / 250% 100%;
+		background: linear-gradient(100deg, var(--name) 38%, var(--fx) 47%, var(--fx2) 53%, var(--name) 62%) 0 0 / 250% 100%;
 		-webkit-background-clip: text;
 		background-clip: text;
 		color: transparent;
@@ -292,7 +281,7 @@
 	:global(.nm.fx-shimmer.grad) {
 		background:
 			linear-gradient(100deg, transparent 38%, var(--fx) 47%, var(--fx2) 53%, transparent 62%) 0 0 / 250% 100%,
-			linear-gradient(var(--name-angle, 90deg), var(--n1), var(--n2));
+			linear-gradient(var(--name-angle, 90deg), var(--name), var(--name2));
 		-webkit-background-clip: text;
 		background-clip: text;
 		animation: fx-shimmer2 4s linear infinite;
@@ -335,16 +324,15 @@
 
 	:global(.nm.fx-outline) {
 		color: transparent;
-		-webkit-text-stroke: max(1px, 0.022em) var(--ink);
+		-webkit-text-stroke: max(1px, 0.022em) var(--name);
 	}
 
 	:global(.nm.fx-outline.grad) {
-		-webkit-text-stroke: max(1px, 0.022em) var(--n1);
+		-webkit-text-stroke: max(1px, 0.022em) var(--name);
 		background: none;
 	}
 
-	:global(html.fx-reveal main figure),
-	:global(html.fx-reveal main .tier) {
+	:global(html.fx-reveal main figure) {
 		animation: fx-reveal linear both;
 		animation-timeline: view();
 		animation-range: entry 0% entry 45%;
@@ -361,15 +349,11 @@
 		}
 	}
 
-	:global(html.fx-lift main figure img),
-	:global(html.fx-lift main .tier img),
-	:global(html.fx-lift .strip img) {
+	:global(html.fx-lift main figure img) {
 		transition: transform 0.25s ease;
 	}
 
-	:global(html.fx-lift main figure:hover img),
-	:global(html.fx-lift main .tier:hover img),
-	:global(html.fx-lift .strip a:hover img) {
+	:global(html.fx-lift main figure:hover img) {
 		transform: translateY(-4px) scale(1.02);
 	}
 
@@ -377,8 +361,7 @@
 		:global(.nm[class*='fx-']),
 		:global(.nm[class*='fx-']::before),
 		:global(.nm[class*='fx-']::after),
-		:global(html.fx-reveal main figure),
-		:global(html.fx-reveal main .tier) {
+		:global(html.fx-reveal main figure) {
 			animation: none !important;
 		}
 	}
@@ -410,7 +393,7 @@
 		outline-offset: 4px;
 	}
 
-	:global(html.card main img) {
+	:global(main img) {
 		border-radius: calc(var(--radius) * 0.6);
 	}
 
@@ -425,10 +408,6 @@
 		pointer-events: none;
 		will-change: transform;
 		transform: translateZ(0);
-	}
-
-	:global(html.card body) {
-		background: linear-gradient(var(--page-angle, 135deg), var(--page), var(--page2));
 	}
 
 	.tint {
@@ -452,51 +431,4 @@
 		transform: translateZ(0);
 	}
 
-	header {
-		display: flex;
-		justify-content: space-between;
-		align-items: baseline;
-		padding: 18px var(--pad);
-		border-bottom: 1px solid var(--rule);
-	}
-
-	.home {
-		font-weight: 800;
-		text-decoration: none;
-		letter-spacing: 0.02em;
-	}
-
-	nav {
-		display: flex;
-		gap: 22px;
-		margin-left: auto;
-	}
-
-	nav a {
-		text-decoration: none;
-	}
-
-	nav a:hover,
-	nav a.on {
-		text-decoration: underline;
-		text-underline-offset: 4px;
-	}
-
-	footer {
-		margin-top: auto;
-		display: flex;
-		justify-content: space-between;
-		gap: 16px;
-		flex-wrap: wrap;
-		padding: 18px var(--pad);
-		border-top: 1px solid var(--line);
-		color: var(--mute);
-		font-size: 13px;
-	}
-
-	@media (max-width: 520px) {
-		nav {
-			gap: 14px;
-		}
-	}
 </style>
