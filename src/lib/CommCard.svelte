@@ -83,7 +83,7 @@
 <style>
 	.status {
 		text-align: var(--a-info, center);
-		font-size: 18px;
+		font-size: calc(18px * var(--text-scale, 1));
 		margin-bottom: 14px;
 	}
 
@@ -120,7 +120,7 @@
 	}
 
 	h3 {
-		font-size: 15px;
+		font-size: calc(15px * var(--text-scale, 1));
 		font-weight: 700;
 		margin-bottom: 8px;
 	}
@@ -131,7 +131,7 @@
 
 	h2 {
 		text-align: var(--a-title, center);
-		font-size: 22px;
+		font-size: calc(22px * var(--text-scale, 1));
 		font-weight: 700;
 		margin-bottom: 16px;
 	}

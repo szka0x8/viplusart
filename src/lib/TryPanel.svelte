@@ -28,6 +28,7 @@
 	const t = {
 		ru: {
 			title: 'настройки',
+			textSize: 'размер текста',
 			cardBlur: 'размытие карточки',
 			btnborder: 'обводка кнопок',
 			btnBorderW: 'толщина обводки',
@@ -153,6 +154,7 @@
 		},
 		en: {
 			title: 'settings',
+			textSize: 'text size',
 			cardBlur: 'card blur',
 			btnborder: 'button border',
 			btnBorderW: 'border width',
@@ -278,12 +280,14 @@
 		}
 	};
 
-	const presets = [
+	type Preset = { ru: string; en: string; paper: string; ink: string; mute: string; line: string; extra?: Partial<typeof defaults> };
+
+	const presets: Preset[] = [
+		{ ru: 'розовый', en: 'pink', paper: defaults.paper, ink: defaults.ink, mute: defaults.mute, line: defaults.line, extra: defaults },
 		{ ru: 'бумага', en: 'paper', paper: '#eeebe4', ink: '#151515', mute: '#77736b', line: '#d3cec4' },
 		{ ru: 'белый', en: 'white', paper: '#ffffff', ink: '#111111', mute: '#777777', line: '#e2e2e2' },
 		{ ru: 'чёрный', en: 'black', paper: '#121212', ink: '#ecebe6', mute: '#8f8b84', line: '#2d2c2a' },
-		{ ru: 'розовый', en: 'rose', paper: '#f3e4e4', ink: '#3a1f24', mute: '#8a6a6e', line: '#e0c8ca' },
-		{ ru: 'зелёный', en: 'sage', paper: '#e3e8df', ink: '#1f2a1f', mute: '#6d7a6a', line: '#cad3c4' },
+		{ ru: 'шалфей', en: 'sage', paper: '#e3e8df', ink: '#1f2a1f', mute: '#6d7a6a', line: '#cad3c4' },
 		{ ru: 'ночь', en: 'night', paper: '#151a24', ink: '#e6e9f0', mute: '#8a93a6', line: '#2a3142' }
 	];
 
@@ -319,16 +323,28 @@
 		save();
 	}
 
-	function apply(p: (typeof presets)[number]) {
-		const { ru, en, ...c } = p;
-		Object.assign(custom, c, {
-			page: c.paper,
-			name: c.ink,
-			btn: mix(c.paper, c.ink, 0.12),
-			btntext: c.ink,
-			btnborder: c.line,
-			icon: c.mute
-		});
+	function apply(p: Preset) {
+		const { paper, ink, mute, line } = p;
+		if (p.extra) {
+			const { paper, page, ink, mute, line, name, btn, btntext, btnborder, icon, cardAlpha } = p.extra;
+			Object.assign(custom, { paper, page, ink, mute, line, name, btn, btntext, btnborder, icon, cardAlpha });
+			custom.grads.page = { ...defaults.grads.page };
+		} else {
+			Object.assign(custom, {
+				paper,
+				page: paper,
+				ink,
+				mute,
+				line,
+				name: ink,
+				btn: mix(paper, ink, 0.12),
+				btntext: ink,
+				btnborder: line,
+				icon: mute,
+				cardAlpha: 82
+			});
+			custom.grads.page.on = false;
+		}
 		changed();
 	}
 
@@ -534,7 +550,12 @@
 				<span class="label">{l.start}</span>
 				<div class="swatches">
 					{#each presets as p}
-						<button title={p[custom.lang]} style:background={p.paper} style:color={p.ink} onclick={() => apply(p)}>Aa</button>
+						<button
+							title={p[custom.lang]}
+							style:background={p.extra ? 'linear-gradient(180deg, #f6a9b1, #f6bcd2)' : p.paper}
+							style:color={p.ink}
+							onclick={() => apply(p)}>Aa</button
+						>
 					{/each}
 				</div>
 				<label class="row">
@@ -600,6 +621,10 @@
 						>
 					{/each}
 				</div>
+				<label class="row">
+					<span>{l.textSize}</span>
+					<input type="range" min="0.85" max="1.5" step="0.05" bind:value={custom.textScale} oninput={changed} />
+				</label>
 
 				<h4>{l.nameFx}</h4>
 				<div class="fxgrid">

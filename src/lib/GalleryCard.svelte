@@ -98,7 +98,7 @@
 
 	figcaption {
 		padding: 6px 4px 0;
-		font-size: 13px;
+		font-size: calc(13px * var(--text-scale, 1));
 		color: var(--mute);
 		text-align: var(--a-info, left);
 	}

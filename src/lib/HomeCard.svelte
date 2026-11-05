@@ -118,7 +118,7 @@
 	.tags {
 		list-style: none;
 		padding: 0;
-		font-size: 18px;
+		font-size: calc(18px * var(--text-scale, 1));
 		text-align: var(--a-info, center);
 		color: var(--ink);
 	}
@@ -129,7 +129,7 @@
 		padding: 10px 16px;
 		border-radius: 999px;
 		text-decoration: none;
-		font-size: 17px;
+		font-size: calc(17px * var(--text-scale, 1));
 	}
 
 	.status {
@@ -146,7 +146,7 @@
 	}
 
 	.mail span {
-		font-size: 12px;
+		font-size: calc(12px * var(--text-scale, 1));
 		letter-spacing: 0.12em;
 		text-transform: uppercase;
 		color: var(--mute);

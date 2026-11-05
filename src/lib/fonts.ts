@@ -10,6 +10,7 @@ export type Font = {
 };
 
 export const fonts: Font[] = [
+	{ id: 'nunito', name: 'Nunito', family: "'Nunito Variable'", weight: 800, stretch: 'normal', spacing: '-0.01em' },
 	{ id: 'archivo', name: 'Archivo', family: "'Archivo Variable'", weight: 900, stretch: '125%', spacing: '-0.03em' },
 	{
 		id: 'playfair',
@@ -99,6 +100,7 @@ export const fonts: Font[] = [
 export const fontById = (id: string) => fonts.find((f) => f.id === id) ?? fonts[0];
 
 export const bodyFonts: Font[] = [
+	{ id: 'nunito', name: 'Nunito', family: "'Nunito Variable'", weight: 500, stretch: 'normal', spacing: '0' },
 	{ id: 'archivo', name: 'Archivo', family: "'Archivo Variable'", weight: 400, stretch: '100%', spacing: '0' },
 	{
 		id: 'cormorant',

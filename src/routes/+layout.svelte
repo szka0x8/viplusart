@@ -1,5 +1,6 @@
 <script lang="ts">
 	import '@fontsource-variable/archivo/wdth.css';
+	import '@fontsource-variable/nunito';
 	import favicon from '#lib/assets/favicon.svg';
 	import { onMount } from 'svelte';
 	import { onNavigate } from '$app/navigation';
@@ -75,6 +76,8 @@
 		} else for (const k of ['body', 'body-adjust']) html.style.removeProperty(`--${k}`);
 		if (custom.on && custom.titleScale !== 1) html.style.setProperty('--title-scale', String(custom.titleScale));
 		else html.style.removeProperty('--title-scale');
+		if (custom.on) html.style.setProperty('--text-scale', String(custom.textScale));
+		else html.style.removeProperty('--text-scale');
 		html.classList.toggle('bw', custom.on && custom.bw);
 		for (const k of gradKeys) {
 			const g = custom.grads?.[k];
@@ -155,15 +158,15 @@
 
 <style>
 	:global(:root) {
-		--paper: #eeebe4;
-		--page: #eeebe4;
-		--ink: #151515;
-		--mute: #77736b;
-		--line: #d3cec4;
+		--paper: #ffffff;
+		--page: #f6a9b1;
+		--ink: #ffffff;
+		--mute: #fff3f6;
+		--line: #ffffff;
 		--name: var(--ink);
-		--btn: #dcd8d0;
-		--btntext: var(--ink);
-		--btnborder: var(--line);
+		--btn: #ffffff;
+		--btntext: #c4527a;
+		--btnborder: #ffffff;
 		--icon: var(--mute);
 		--fx: #b98cff;
 		--pcolor: var(--fx);
@@ -183,7 +186,7 @@
 			color-mix(in srgb, var(--paper) var(--card-alpha, 82%), transparent),
 			color-mix(in srgb, var(--paper) var(--card-alpha, 82%), transparent)
 		);
-		--page-img: linear-gradient(var(--page), var(--page));
+		--page-img: linear-gradient(180deg, var(--page), #f6bcd2);
 		--ink-img: linear-gradient(var(--ink), var(--ink));
 		--mute-img: linear-gradient(var(--mute), var(--mute));
 		--line-img: linear-gradient(var(--line), var(--line));
@@ -193,6 +196,8 @@
 		--btnborder-img: linear-gradient(var(--btnborder), var(--btnborder));
 		--tint-img: linear-gradient(var(--tint), var(--tint));
 		--radius: 24px;
+		--card-alpha: 22%;
+		--text-scale: 1.15;
 		--pad: clamp(16px, 4vw, 48px);
 	}
 
@@ -204,9 +209,9 @@
 	:global(body) {
 		background: var(--page-img);
 		color: var(--ink);
-		font-family: var(--body, 'Archivo Variable'), system-ui, sans-serif;
+		font-family: var(--body, 'Nunito Variable'), system-ui, sans-serif;
 		font-size-adjust: var(--body-adjust, none);
-		font-size: 15px;
+		font-size: calc(15px * var(--text-scale, 1));
 		line-height: 1.45;
 		min-height: 100dvh;
 		display: flex;
@@ -224,11 +229,11 @@
 	}
 
 	:global(h1) {
-		font-family: var(--display, 'Archivo Variable'), system-ui, sans-serif;
+		font-family: var(--display, 'Nunito Variable'), system-ui, sans-serif;
 		font-size-adjust: var(--display-adjust, none);
-		font-weight: var(--display-weight, 900);
-		font-stretch: var(--display-stretch, 125%);
-		letter-spacing: var(--display-spacing, -0.03em);
+		font-weight: var(--display-weight, 800);
+		font-stretch: var(--display-stretch, normal);
+		letter-spacing: var(--display-spacing, -0.01em);
 	}
 
 	:global(html.js img) {
@@ -273,6 +278,7 @@
 			var(--btn-img) padding-box,
 			var(--btnborder-img) border-box;
 		color: var(--btntext);
+		box-shadow: 0 4px 14px rgb(0 0 0 / 0.07);
 		transition: filter 0.2s;
 	}
 
