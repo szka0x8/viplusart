@@ -28,6 +28,11 @@
 	const t = {
 		ru: {
 			title: 'настройки',
+			cardBlur: 'размытие карточки',
+			btnborder: 'обводка кнопок',
+			btnBorderW: 'толщина обводки',
+			dir: 'направление',
+			radial: 'из центра',
 			basics: 'основа',
 			fonts: 'шрифты',
 			cardSec: 'карточка',
@@ -122,7 +127,6 @@
 			showTags: 'о тебе',
 			showStatus: 'статус комиссий',
 			gallery: 'галерея',
-			masonry: 'мозаика',
 			grid: 'сетка',
 			big: 'крупно',
 			cols: 'кол.',
@@ -149,6 +153,11 @@
 		},
 		en: {
 			title: 'settings',
+			cardBlur: 'card blur',
+			btnborder: 'button border',
+			btnBorderW: 'border width',
+			dir: 'direction',
+			radial: 'from center',
 			basics: 'basics',
 			fonts: 'fonts',
 			cardSec: 'card',
@@ -243,7 +252,6 @@
 			showTags: 'about you',
 			showStatus: 'commission status',
 			gallery: 'gallery',
-			masonry: 'mosaic',
 			grid: 'grid',
 			big: 'large',
 			cols: 'col.',
@@ -279,6 +287,13 @@
 		{ ru: 'ночь', en: 'night', paper: '#151a24', ink: '#e6e9f0', mute: '#8a93a6', line: '#2a3142' }
 	];
 
+	const dirs = [
+		{ icon: '→', a: 90 },
+		{ icon: '↓', a: 180 },
+		{ icon: '↘', a: 135 },
+		{ icon: '↗', a: 45 }
+	];
+
 	function mix(a: string, b: string, t: number) {
 		const p = (h: string, i: number) => parseInt(h.slice(1 + i * 2, 3 + i * 2), 16);
 		return '#' + [0, 1, 2].map((i) => Math.round(p(a, i) + (p(b, i) - p(a, i)) * t).toString(16).padStart(2, '0')).join('');
@@ -309,8 +324,9 @@
 		Object.assign(custom, c, {
 			page: c.paper,
 			name: c.ink,
-			btn: mix(c.paper, c.ink, 0.1),
+			btn: mix(c.paper, c.ink, 0.12),
 			btntext: c.ink,
+			btnborder: c.line,
 			icon: c.mute
 		});
 		changed();
@@ -438,10 +454,35 @@
 			</span>
 		</div>
 		{#if angle}
-			<label class="row sub2">
-				<span>↳ {l.angle}</span>
-				<input type="range" min="0" max="360" step="5" bind:value={g.angle} oninput={changed} />
-			</label>
+			<div class="row sub2">
+				<span>↳ {l.dir}</span>
+				<span class="dirs">
+					{#each dirs as d}
+						<button
+							class:on={!g.radial && g.angle === d.a}
+							onclick={() => {
+								g.radial = false;
+								g.angle = d.a;
+								changed();
+							}}>{d.icon}</button
+						>
+					{/each}
+					<button
+						class:on={!!g.radial}
+						title={l.radial}
+						onclick={() => {
+							g.radial = !g.radial;
+							changed();
+						}}>◎</button
+					>
+				</span>
+			</div>
+			{#if !g.radial}
+				<label class="row sub2">
+					<span>↳ {l.angle}</span>
+					<input type="range" min="0" max="360" step="5" bind:value={g.angle} oninput={changed} />
+				</label>
+			{/if}
 		{/if}
 	{/if}
 {/snippet}
@@ -504,6 +545,10 @@
 					<span>{l.cardAlpha}</span>
 					<input type="range" min="20" max="100" step="2" bind:value={custom.cardAlpha} oninput={changed} />
 				</label>
+				<label class="row">
+					<span>{l.cardBlur}</span>
+					<input type="range" min="0" max="30" step="1" bind:value={custom.cardBlur} oninput={changed} />
+				</label>
 
 				<h4>{l.colors}</h4>
 				<span class="label">{l.cardSec}</span>
@@ -517,6 +562,11 @@
 				<span class="label">{l.btnSec}</span>
 				{@render colorRow('btn', l.btn)}
 				{@render colorRow('btntext', l.btntext)}
+				{@render colorRow('btnborder', l.btnborder)}
+				<label class="row">
+					<span>{l.btnBorderW}</span>
+					<input type="range" min="0" max="4" step="0.5" bind:value={custom.btnBorder} oninput={changed} />
+				</label>
 				{@render colorRow('icon', l.icon)}
 
 				<h4>{l.fonts}</h4>
@@ -528,6 +578,7 @@
 							style:font-family={f.family}
 							style:font-weight={f.weight}
 							style:font-stretch={f.stretch}
+							style:font-size-adjust={f.adjust ?? null}
 							title={f.name}
 							onclick={() => setc('font', f.id)}>{f.name}</button
 						>
@@ -544,6 +595,7 @@
 							class="plain"
 							class:on={custom.bodyFont === f.id}
 							style:font-family={f.family}
+							style:font-size-adjust={f.adjust ?? null}
 							onclick={() => setc('bodyFont', f.id)}>{f.name}</button
 						>
 					{/each}
@@ -707,7 +759,7 @@
 				{@render toggle(l.showStatus, custom.showStatus, (v) => setc('showStatus', v))}
 
 				<h4>{l.gallery} <a class="link" href={resolve('/gallery')}>→</a></h4>
-				{@render seg(['grid', 'masonry', 'big'] as const, custom.galLayout, (v) => setc('galLayout', v), (v) => l[v])}
+				{@render seg(['grid', 'asis', 'big'] as const, custom.galLayout, (v) => setc('galLayout', v), (v) => l[v])}
 				{#if custom.galLayout !== 'big'}
 					{@render seg([2, 3, 4] as const, custom.galCols, (v) => setc('galCols', v), (v) => `${v} ${l.cols}`)}
 				{/if}
@@ -1050,6 +1102,24 @@
 	}
 
 	.fxgrid button.on {
+		border-color: #111;
+		background: #f2f2f2;
+		font-weight: 700;
+	}
+
+	.dirs {
+		display: flex;
+		gap: 3px;
+	}
+
+	.dirs button {
+		width: 26px;
+		height: 22px;
+		border: 1px solid #ddd;
+		font-size: 12px;
+	}
+
+	.dirs button.on {
 		border-color: #111;
 		background: #f2f2f2;
 		font-weight: 700;

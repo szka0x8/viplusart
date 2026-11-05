@@ -43,14 +43,11 @@
 		gap: var(--gap);
 	}
 
-	.masonry {
-		columns: var(--cols);
-		column-gap: var(--gap);
-	}
-
-	.masonry figure {
-		break-inside: avoid;
-		margin-bottom: var(--gap);
+	.asis {
+		display: grid;
+		grid-template-columns: repeat(var(--cols), 1fr);
+		gap: var(--gap);
+		align-items: start;
 	}
 
 	.big {
@@ -67,8 +64,8 @@
 		grid-column: 1 / -1;
 	}
 
-	.masonry.hero .first {
-		column-span: all;
+	.asis.hero .first {
+		grid-column: 1 / -1;
 	}
 
 	button {
@@ -111,8 +108,8 @@
 			grid-template-columns: repeat(min(var(--cols), 2), 1fr);
 		}
 
-		.masonry {
-			columns: min(var(--cols), 2);
+		.asis {
+			grid-template-columns: repeat(min(var(--cols), 2), 1fr);
 		}
 	}
 </style>

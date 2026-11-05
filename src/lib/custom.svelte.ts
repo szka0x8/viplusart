@@ -1,11 +1,11 @@
 import { site, commissions, gallery, type GalleryItem } from './data.ts';
 import { resolve } from '$app/paths';
 
-export const colorKeys = ['paper', 'page', 'ink', 'mute', 'line', 'name', 'btn', 'btntext', 'icon', 'fx', 'pcolor', 'tint'] as const;
-export const gradKeys = ['paper', 'page', 'ink', 'mute', 'line', 'name', 'btn', 'btntext', 'fx', 'pcolor', 'tint'] as const;
+export const colorKeys = ['paper', 'page', 'ink', 'mute', 'line', 'name', 'btn', 'btntext', 'btnborder', 'icon', 'fx', 'pcolor', 'tint'] as const;
+export const gradKeys = ['paper', 'page', 'ink', 'mute', 'line', 'name', 'btn', 'btntext', 'btnborder', 'fx', 'pcolor', 'tint'] as const;
 export type ColorKey = (typeof colorKeys)[number];
 export type GradKey = (typeof gradKeys)[number];
-type Grad = { on: boolean; c2: string; angle: number };
+type Grad = { on: boolean; c2: string; angle: number; radial?: boolean };
 
 export const defaults = {
 	paper: '#eeebe4',
@@ -16,11 +16,14 @@ export const defaults = {
 	name: '#151515',
 	btn: '#dcd8d0',
 	btntext: '#151515',
+	btnborder: '#d3cec4',
 	icon: '#77736b',
 	fx: '#b98cff',
 	pcolor: '#b98cff',
 	tint: '#000000',
 	cardAlpha: 82,
+	cardBlur: 12,
+	btnBorder: 1,
 	tintAmount: 0,
 	bgOpacity: 0.35,
 	bgBlur: 4,
@@ -42,7 +45,7 @@ export const defaults = {
 	avatarShape: 'square' as 'square' | 'round' | 'arch',
 	showTags: true,
 	showStatus: true,
-	galLayout: 'grid' as 'grid' | 'masonry' | 'big',
+	galLayout: 'grid' as 'grid' | 'asis' | 'big',
 	galCols: 2 as 2 | 3 | 4,
 	galGap: 'normal' as 'tight' | 'normal' | 'wide',
 	galHero: true,
@@ -69,6 +72,7 @@ export const defaults = {
 		name: { on: false, c2: '#b98cff', angle: 90 },
 		btn: { on: false, c2: '#e9d9f5', angle: 90 },
 		btntext: { on: false, c2: '#6a3df0', angle: 90 },
+		btnborder: { on: false, c2: '#b98cff', angle: 90 },
 		fx: { on: false, c2: '#ff9ad5', angle: 90 },
 		pcolor: { on: false, c2: '#ff9ad5', angle: 90 },
 		tint: { on: false, c2: '#ff9ad5', angle: 135 }
@@ -119,6 +123,7 @@ function merge(data: Partial<Design>) {
 
 function fixFx() {
 	if (!['none', 'glow', 'shimmer', 'type', 'outline', 'sparkle'].includes(custom.nameFx)) custom.nameFx = 'none';
+	if (!['grid', 'asis', 'big'].includes(custom.galLayout)) custom.galLayout = 'asis';
 }
 
 export function load() {

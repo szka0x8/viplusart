@@ -68,11 +68,7 @@
 	.card {
 		width: min(800px, 100%);
 		padding: clamp(24px, 4vw, 40px);
-		background: linear-gradient(
-			var(--paper-angle, 135deg),
-			color-mix(in srgb, var(--paper) var(--card-alpha, 82%), transparent),
-			color-mix(in srgb, var(--paper2) var(--card-alpha, 82%), transparent)
-		);
+		background: var(--paper-img);
 		border: 1px solid var(--line);
 		border-radius: var(--radius);
 		box-shadow: 0 24px 60px rgb(0 0 0 / 0.12);
@@ -183,7 +179,7 @@
 
 	@media (hover: hover) and (pointer: fine) {
 		.card {
-			backdrop-filter: blur(12px);
+			backdrop-filter: blur(var(--card-blur, 12px));
 		}
 	}
 </style>

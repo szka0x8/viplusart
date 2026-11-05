@@ -5,6 +5,7 @@ export type Font = {
 	weight: number;
 	stretch: string;
 	spacing: string;
+	adjust?: number;
 	load?: () => Promise<unknown>;
 };
 
@@ -23,6 +24,7 @@ export const fonts: Font[] = [
 		id: 'cormorant',
 		name: 'Cormorant',
 		family: "'Cormorant Garamond'",
+		adjust: 0.5,
 		weight: 700,
 		stretch: 'normal',
 		spacing: '-0.01em',
@@ -59,6 +61,7 @@ export const fonts: Font[] = [
 		id: 'vibes',
 		name: 'Great Vibes',
 		family: "'Great Vibes'",
+		adjust: 0.48,
 		weight: 400,
 		stretch: 'normal',
 		spacing: '0',
@@ -101,6 +104,7 @@ export const bodyFonts: Font[] = [
 		id: 'cormorant',
 		name: 'Cormorant',
 		family: "'Cormorant Garamond'",
+		adjust: 0.5,
 		weight: 400,
 		stretch: 'normal',
 		spacing: '0',

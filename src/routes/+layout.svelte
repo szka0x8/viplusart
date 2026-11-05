@@ -56,8 +56,10 @@
 			root.setProperty('--display-weight', String(f.weight));
 			root.setProperty('--display-stretch', f.stretch);
 			root.setProperty('--display-spacing', f.spacing);
+			if (f.adjust) root.setProperty('--display-adjust', String(f.adjust));
+			else root.removeProperty('--display-adjust');
 		} else {
-			for (const k of ['display', 'display-weight', 'display-stretch', 'display-spacing'])
+			for (const k of ['display', 'display-weight', 'display-stretch', 'display-spacing', 'display-adjust'])
 				root.removeProperty(`--${k}`);
 		}
 	});
@@ -68,7 +70,9 @@
 		if (custom.on) {
 			b.load?.();
 			html.style.setProperty('--body', b.family);
-		} else html.style.removeProperty('--body');
+			if (b.adjust) html.style.setProperty('--body-adjust', String(b.adjust));
+			else html.style.removeProperty('--body-adjust');
+		} else for (const k of ['body', 'body-adjust']) html.style.removeProperty(`--${k}`);
 		if (custom.on && custom.titleScale !== 1) html.style.setProperty('--title-scale', String(custom.titleScale));
 		else html.style.removeProperty('--title-scale');
 		html.classList.toggle('bw', custom.on && custom.bw);
@@ -76,11 +80,16 @@
 			const g = custom.grads?.[k];
 			const on = custom.on && !!g?.on;
 			if (on) {
+				const c = (v: string) => (k === 'paper' ? `color-mix(in srgb, ${v} var(--card-alpha, 82%), transparent)` : v);
+				const stops = `${c(custom[k])}, ${c(g.c2)}`;
 				html.style.setProperty(`--${k}2`, g.c2);
-				html.style.setProperty(`--${k}-angle`, `${g.angle}deg`);
+				html.style.setProperty(
+					`--${k}-img`,
+					g.radial ? `radial-gradient(circle, ${stops})` : `linear-gradient(${g.angle}deg, ${stops})`
+				);
 			} else {
 				html.style.removeProperty(`--${k}2`);
-				html.style.removeProperty(`--${k}-angle`);
+				html.style.removeProperty(`--${k}-img`);
 			}
 			if (k === 'ink' || k === 'mute' || k === 'line' || k === 'btntext') html.classList.toggle(`g-${k}`, on);
 		}
@@ -90,8 +99,11 @@
 		html.classList.toggle('edit-crop', editing.crop);
 		if (custom.on) html.style.setProperty('--radius', `${custom.radius}px`);
 		else html.style.removeProperty('--radius');
-		if (custom.on) html.style.setProperty('--card-alpha', `${custom.cardAlpha}%`);
-		else html.style.removeProperty('--card-alpha');
+		if (custom.on) {
+			html.style.setProperty('--card-alpha', `${custom.cardAlpha}%`);
+			html.style.setProperty('--card-blur', `${custom.cardBlur}px`);
+			html.style.setProperty('--btn-bw', `${custom.btnBorder}px`);
+		} else for (const k of ['card-alpha', 'card-blur', 'btn-bw']) html.style.removeProperty(`--${k}`);
 
 		const flex = { left: 'flex-start', center: 'center', right: 'flex-end' } as const;
 		const mi = { left: ['0', 'auto'], center: ['auto', 'auto'], right: ['auto', '0'] } as const;
@@ -151,6 +163,7 @@
 		--name: var(--ink);
 		--btn: #dcd8d0;
 		--btntext: var(--ink);
+		--btnborder: var(--line);
 		--icon: var(--mute);
 		--fx: #b98cff;
 		--pcolor: var(--fx);
@@ -163,8 +176,22 @@
 		--name2: var(--name);
 		--btn2: var(--btn);
 		--btntext2: var(--btntext);
+		--btnborder2: var(--btnborder);
 		--fx2: var(--fx);
 		--tint2: var(--tint);
+		--paper-img: linear-gradient(
+			color-mix(in srgb, var(--paper) var(--card-alpha, 82%), transparent),
+			color-mix(in srgb, var(--paper) var(--card-alpha, 82%), transparent)
+		);
+		--page-img: linear-gradient(var(--page), var(--page));
+		--ink-img: linear-gradient(var(--ink), var(--ink));
+		--mute-img: linear-gradient(var(--mute), var(--mute));
+		--line-img: linear-gradient(var(--line), var(--line));
+		--name-img: linear-gradient(var(--name), var(--name));
+		--btn-img: linear-gradient(var(--btn), var(--btn));
+		--btntext-img: linear-gradient(var(--btntext), var(--btntext));
+		--btnborder-img: linear-gradient(var(--btnborder), var(--btnborder));
+		--tint-img: linear-gradient(var(--tint), var(--tint));
 		--radius: 24px;
 		--pad: clamp(16px, 4vw, 48px);
 	}
@@ -175,9 +202,10 @@
 	}
 
 	:global(body) {
-		background: linear-gradient(var(--page-angle, 135deg), var(--page), var(--page2));
+		background: var(--page-img);
 		color: var(--ink);
 		font-family: var(--body, 'Archivo Variable'), system-ui, sans-serif;
+		font-size-adjust: var(--body-adjust, none);
 		font-size: 15px;
 		line-height: 1.45;
 		min-height: 100dvh;
@@ -197,6 +225,7 @@
 
 	:global(h1) {
 		font-family: var(--display, 'Archivo Variable'), system-ui, sans-serif;
+		font-size-adjust: var(--display-adjust, none);
 		font-weight: var(--display-weight, 900);
 		font-stretch: var(--display-stretch, 125%);
 		letter-spacing: var(--display-spacing, -0.03em);
@@ -221,25 +250,28 @@
 	}
 
 	:global(html.g-ink main :where(p, li, h2, h3, dt, dd, a:not(.btn, .pill, .back))) {
-		background: linear-gradient(var(--ink-angle, 90deg), var(--ink), var(--ink2));
+		background: var(--ink-img);
 		-webkit-background-clip: text;
 		background-clip: text;
 		color: transparent !important;
 	}
 
 	:global(html:is(.g-ink, .g-mute) main :is(.status, .mail span, figcaption, .payment)) {
-		background: linear-gradient(var(--mute-angle, 90deg), var(--mute), var(--mute2));
+		background: var(--mute-img);
 		-webkit-background-clip: text;
 		background-clip: text;
 		color: transparent !important;
 	}
 
 	:global(html.g-line hr.sep) {
-		border-image: linear-gradient(var(--line-angle, 90deg), var(--line), var(--line2)) 1;
+		border-image: var(--line-img) 1;
 	}
 
 	:global(:is(.btn, .pill, .back)) {
-		background: linear-gradient(var(--btn-angle, 90deg), var(--btn), var(--btn2));
+		border: var(--btn-bw, 1px) solid transparent;
+		background:
+			var(--btn-img) padding-box,
+			var(--btnborder-img) border-box;
 		color: var(--btntext);
 		transition: filter 0.2s;
 	}
@@ -249,7 +281,7 @@
 	}
 
 	:global(html.g-btntext :is(.btn, .pill, .back) > span) {
-		background: linear-gradient(var(--btntext-angle, 90deg), var(--btntext), var(--btntext2));
+		background: var(--btntext-img);
 		-webkit-background-clip: text;
 		background-clip: text;
 		color: transparent;
@@ -260,7 +292,7 @@
 	}
 
 	:global(.nm.grad) {
-		background: linear-gradient(var(--name-angle, 90deg), var(--name), var(--name2));
+		background: var(--name-img);
 		-webkit-background-clip: text;
 		background-clip: text;
 		color: transparent;
@@ -281,7 +313,7 @@
 	:global(.nm.fx-shimmer.grad) {
 		background:
 			linear-gradient(100deg, transparent 38%, var(--fx) 47%, var(--fx2) 53%, transparent 62%) 0 0 / 250% 100%,
-			linear-gradient(var(--name-angle, 90deg), var(--name), var(--name2));
+			var(--name-img);
 		-webkit-background-clip: text;
 		background-clip: text;
 		animation: fx-shimmer2 4s linear infinite;
@@ -411,7 +443,7 @@
 	}
 
 	.tint {
-		background: linear-gradient(var(--tint-angle, 135deg), var(--tint), var(--tint2));
+		background: var(--tint-img);
 		position: fixed;
 		inset: 0;
 		z-index: -1;
